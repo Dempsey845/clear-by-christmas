@@ -46,7 +46,7 @@ initial_depth = 0.28
 
 [node name="RoadDrift" parent="RoadSnow" unique_id=30475574 instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
-initial_depth = 0.46
+initial_depth = 0.90
 
 [node name="RoadFar" parent="RoadSnow" unique_id=1769406772 instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)

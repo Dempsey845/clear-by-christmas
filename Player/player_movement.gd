@@ -6,6 +6,13 @@ extends Node
 @export var ground_deceleration: float = 30.0
 @export var air_acceleration: float = 10.0
 
+@export_category("Snow")
+@export_range(0.0, 0.6, 0.01) var max_snow_step_height := 0.34
+@export_range(0.0, 1.0, 0.01) var snow_step_reach := 0.50
+@export_range(0.2, 1.5, 0.01) var footprint_stride := 0.63
+@export var footprint_size := Vector2(0.30, 0.42)
+@export_range(0.0, 0.12, 0.005) var footprint_depth := 0.055
+
 @export_category("Jump")
 @export var jump_velocity: float = 7.0
 @export var gravity: float = 22.0
@@ -28,9 +35,19 @@ var default_camera_position: Vector3
 
 var camera_pitch: float = 0.0
 
+var _head_rest_position: Vector3
+var _step_camera_offset := Vector3.ZERO
+var _step_collision := KinematicCollision3D.new()
+var _footprint_ray := PhysicsRayQueryParameters3D.new()
+var _distance_since_print := 0.0
+var _foot_side := -1.0
+
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	default_camera_position = camera.position
+	_head_rest_position = head.position
+	_footprint_ray.exclude = [body.get_rid()]
+	_footprint_ray.collision_mask = body.collision_mask
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -62,7 +79,93 @@ func _physics_process(delta: float) -> void:
 	_handle_jump()
 	_handle_movement(delta)
 
+	var start := body.global_position
+	if not _try_snow_step(delta):
+		body.move_and_slide()
+	_leave_footprint(start)
+
+	_step_camera_offset *= exp(-camera_offset_speed * delta)
+	head.position = _head_rest_position + body.global_basis.inverse() * _step_camera_offset
+
+
+func _try_snow_step(delta: float) -> bool:
+	if not body.is_on_floor() or body.velocity.y > 0.0 or max_snow_step_height <= 0.0:
+		return false
+
+	var horizontal := Vector3(body.velocity.x, 0.0, body.velocity.z) * delta
+	if horizontal.length_squared() < 0.000001:
+		return false
+	var start := body.global_transform
+	if not body.test_move(start, horizontal, _step_collision):
+		return false
+	if _snow_field_for(_step_collision.get_collider()) == null:
+		return false
+	if _step_collision.get_angle(0, Vector3.UP) <= body.floor_max_angle:
+		return false
+
+	# Sweep the whole player up, across, then down so steps respect walls and ceilings.
+	var lift := Vector3.UP * (max_snow_step_height + body.safe_margin)
+	if body.test_move(start, lift):
+		return false
+	var landing := start.translated(lift)
+	var approach := horizontal + horizontal.normalized() * snow_step_reach
+	if body.test_move(landing, approach):
+		return false
+	landing.origin += approach
+	if not body.test_move(landing, -lift, _step_collision):
+		return false
+	if _step_collision.get_angle(0, Vector3.UP) > body.floor_max_angle:
+		return false
+
+	landing.origin += _step_collision.get_travel()
+	var rise := landing.origin.y - start.origin.y
+	if rise <= body.safe_margin or rise > max_snow_step_height:
+		return false
+
+	body.global_position = landing.origin
+	var velocity := body.velocity
+	body.velocity = Vector3.DOWN * 0.5
 	body.move_and_slide()
+	body.velocity.x = velocity.x
+	body.velocity.z = velocity.z
+	_step_camera_offset += start.origin - body.global_position
+	return true
+
+
+func _leave_footprint(start: Vector3) -> void:
+	if not body.is_on_floor() or footprint_depth <= 0.0:
+		_distance_since_print = 0.0
+		return
+
+	var travel := body.global_position - start
+	travel.y = 0.0
+	var distance := travel.length()
+	if distance < 0.001:
+		return
+	_distance_since_print += distance
+	if _distance_since_print < footprint_stride:
+		return
+	_distance_since_print -= footprint_stride
+
+	var forward := travel / distance
+	var foot := body.global_position + forward.cross(Vector3.UP) * (_foot_side * 0.16)
+	_foot_side *= -1.0
+	_footprint_ray.from = foot + Vector3.UP * 0.12
+	_footprint_ray.to = foot + Vector3.DOWN * 0.22
+	var hit := body.get_world_3d().direct_space_state.intersect_ray(_footprint_ray)
+	if hit.is_empty():
+		return
+	var field := _snow_field_for(hit.collider)
+	if field != null:
+		field.stamp_footprint(hit.position, forward, footprint_size, footprint_depth)
+
+
+func _snow_field_for(collider: Object) -> SnowField:
+	if collider is not StaticBody3D:
+		return null
+	var chunk := collider.get_parent() as SnowChunk
+	return chunk.get_parent() as SnowField if chunk != null else null
+
 
 func _handle_movement(delta: float) -> void:
 	var input_direction: Vector2 = Input.get_vector(
@@ -121,8 +224,7 @@ func _handle_jump() -> void:
 
 func _apply_gravity(delta: float) -> void:
 	if body.is_on_floor():
-		if body.velocity.y < 0.0:
-			body.velocity.y = -0.5
+		body.velocity.y = minf(body.velocity.y, -0.5)
 
 		return
 

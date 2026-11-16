@@ -15,6 +15,10 @@ var _vertices := PackedVector3Array()
 var _normals := PackedVector3Array()
 var _colors := PackedColorArray()
 var _uvs := PackedVector2Array()
+var _footprints := PackedFloat32Array()
+var _heightmap := HeightMapShape3D.new()
+var _collider: CollisionShape3D
+var _collision_heights := PackedFloat32Array()
 
 
 func initialize(field: SnowField, noise: FastNoiseLite) -> void:
@@ -27,6 +31,7 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 	_normals.resize(count)
 	_colors.resize(count)
 	_uvs.resize(count)
+	_footprints.resize(count)
 	material_override = MATERIAL
 
 	for z in side:
@@ -51,6 +56,9 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 			_vertices[index] = Vector3(x * field.spacing, 0.0, z * field.spacing)
 			_uvs[index] = point
 	initial_depths = depths.duplicate()
+	if field.collision_enabled:
+		_create_collision(field)
+		rebuild_collision(field)
 
 
 func rebuild(field: SnowField) -> void:
@@ -58,7 +66,7 @@ func rebuild(field: SnowField) -> void:
 	var side := cells + 1
 	var has_snow := false
 	for index in depths.size():
-		if depths[index] >= 0.006:
+		if surface_depth(index) >= 0.006:
 			has_snow = true
 			break
 	if not has_snow:
@@ -70,14 +78,15 @@ func rebuild(field: SnowField) -> void:
 		for x in side:
 			var index := z * side + x
 			var point := origin + Vector2i(x, z)
-			var left := depths[index - 1] if x > 0 else field.grid_depth(point - Vector2i(1, 0))
-			var right := depths[index + 1] if x < cells else field.grid_depth(point + Vector2i(1, 0))
-			var back := depths[index - side] if z > 0 else field.grid_depth(point - Vector2i(0, 1))
-			var front := depths[index + side] if z < cells else field.grid_depth(point + Vector2i(0, 1))
+			var left := surface_depth(index - 1) if x > 0 else field.grid_surface_depth(point - Vector2i(1, 0))
+			var right := surface_depth(index + 1) if x < cells else field.grid_surface_depth(point + Vector2i(1, 0))
+			var back := surface_depth(index - side) if z > 0 else field.grid_surface_depth(point - Vector2i(0, 1))
+			var front := surface_depth(index + side) if z < cells else field.grid_surface_depth(point + Vector2i(0, 1))
 			var normal := Vector3(left - right, 2.0 * field.spacing, back - front).normalized()
-			_vertices[index].y = depths[index] + 0.002
+			var depth := surface_depth(index)
+			_vertices[index].y = depth + 0.002
 			_normals[index] = normal
-			_colors[index] = Color(minf(depths[index] * 2.0, 1.0), normal.y, 0.0)
+			_colors[index] = Color(minf(depth * 2.0, 1.0), normal.y, minf(_footprints[index] * 12.0, 1.0))
 
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
@@ -89,3 +98,52 @@ func rebuild(field: SnowField) -> void:
 	var surface := ArrayMesh.new()
 	surface.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	mesh = surface
+
+
+func surface_depth(index: int) -> float:
+	return depths[index] - _footprints[index]
+
+
+func stamp_footprint(index: int, depth: float) -> bool:
+	var indentation := minf(depth, depths[index] * 0.55)
+	if indentation <= _footprints[index]:
+		return false
+	_footprints[index] = indentation
+	return true
+
+
+func clear_footprint(index: int) -> void:
+	_footprints[index] = 0.0
+
+
+func reset_depths() -> void:
+	depths = initial_depths.duplicate()
+	_footprints.fill(0.0)
+
+
+func _create_collision(field: SnowField) -> void:
+	var collider_body := StaticBody3D.new()
+	collider_body.name = "SnowCollision"
+	collider_body.collision_layer = SnowField.COLLISION_LAYER
+	collider_body.collision_mask = 0
+	add_child(collider_body)
+	_collider = CollisionShape3D.new()
+	collider_body.add_child(_collider)
+	_collider.position = Vector3(field.chunk_size * 0.5, 0.0, field.chunk_size * 0.5)
+	_collider.scale = Vector3.ONE * field.spacing
+	_heightmap.map_width = field.cells_per_chunk + 1
+	_heightmap.map_depth = field.cells_per_chunk + 1
+	_collision_heights.resize(depths.size())
+
+
+func rebuild_collision(field: SnowField) -> void:
+	var has_snow := false
+	for index in depths.size():
+		var depth := depths[index]
+		_collision_heights[index] = depth / field.spacing
+		has_snow = has_snow or depth >= 0.006
+	if has_snow:
+		_heightmap.map_data = _collision_heights
+		_collider.shape = _heightmap
+	else:
+		_collider.shape = null

@@ -1,6 +1,9 @@
 class_name SnowField
 extends Node3D
 
+const COLLISION_LAYER := 1 << 1
+
+@export var collision_enabled := true
 @export_range(1.0, 16.0, 0.25) var chunk_size := 4.0
 @export_range(8, 64, 1) var cells_per_chunk := 32
 @export_range(1, 16, 1) var mesh_updates_per_frame := 4
@@ -11,6 +14,7 @@ var indices := PackedInt32Array()
 
 var _chunks: Dictionary[Vector2i, SnowChunk] = {}
 var _dirty: Dictionary[Vector2i, SnowChunk] = {}
+var _collision_dirty: Dictionary[Vector2i, bool] = {}
 var _bounds: AABB
 
 
@@ -52,6 +56,8 @@ func _process(_delta: float) -> void:
 		var chunk := _dirty[tile]
 		_dirty.erase(tile)
 		chunk.rebuild(self)
+		if _collision_dirty.erase(tile):
+			chunk.rebuild_collision(self)
 	if _dirty.is_empty():
 		set_process(false)
 
@@ -94,13 +100,13 @@ func sample_owners(sample: Vector2i) -> Array[SnowChunk]:
 	return owners
 
 
-func grid_depth(sample: Vector2i) -> float:
+func grid_surface_depth(sample: Vector2i) -> float:
 	var tile := _sample_tile(sample)
 	var chunk := _chunks.get(tile) as SnowChunk
 	if chunk == null:
 		return 0.0
 	var local := sample - tile * cells_per_chunk
-	return chunk.depths[local.y * (cells_per_chunk + 1) + local.x]
+	return chunk.surface_depth(local.y * (cells_per_chunk + 1) + local.x)
 
 
 func depth_at(point: Vector3) -> float:
@@ -108,10 +114,10 @@ func depth_at(point: Vector3) -> float:
 	var scaled := Vector2(local.x, local.z) / spacing
 	var start := Vector2i(scaled.floor())
 	var fraction := scaled - Vector2(start)
-	var a := grid_depth(start)
-	var b := grid_depth(start + Vector2i(1, 0))
-	var c := grid_depth(start + Vector2i(0, 1))
-	var d := grid_depth(start + Vector2i(1, 1))
+	var a := grid_surface_depth(start)
+	var b := grid_surface_depth(start + Vector2i(1, 0))
+	var c := grid_surface_depth(start + Vector2i(0, 1))
+	var d := grid_surface_depth(start + Vector2i(1, 1))
 	# Match the two triangles used by the rendered mesh.
 	if fraction.x + fraction.y <= 1.0:
 		return a + (b - a) * fraction.x + (c - a) * fraction.y
@@ -129,8 +135,9 @@ func cut(point: Vector3, forward: Vector3, size: Vector2, depth: float, rounded:
 		if amount <= 0.0:
 			continue
 		chunk.depths[index] -= amount
+		chunk.clear_footprint(index)
 		removed += amount * chunk.weights[index]
-		_queue_edit(chunk, index)
+		_queue_edit(chunk, index, true)
 	if removed > 0.0:
 		set_process(true)
 	return removed
@@ -149,20 +156,37 @@ func deposit(point: Vector3, radius: float, volume: float) -> bool:
 		var chunk: SnowChunk = sample[0]
 		var index: int = sample[1]
 		chunk.depths[index] += volume * float(sample[2]) / area
-		_queue_edit(chunk, index)
+		chunk.clear_footprint(index)
+		_queue_edit(chunk, index, true)
 	set_process(true)
 	return true
 
 
+func stamp_footprint(point: Vector3, forward: Vector3, size: Vector2, depth: float) -> void:
+	# Keep a bootprint wide enough to reach vertices on coarser grids.
+	size = size.max(Vector2.ONE * spacing * 1.9)
+	for sample in _brush(point, forward, size, true):
+		var chunk: SnowChunk = sample[0]
+		var index: int = sample[1]
+		if chunk.depths[index] >= 0.025 and chunk.stamp_footprint(index, depth * float(sample[2])):
+			_queue_edit(chunk, index, false)
+	if not _dirty.is_empty():
+		set_process(true)
+
+
 func reset_snow() -> void:
 	for chunk in _chunks.values():
-		chunk.depths = chunk.initial_depths.duplicate()
+		chunk.reset_depths()
+		if collision_enabled:
+			_collision_dirty[chunk.tile] = true
 		_dirty[chunk.tile] = chunk
 	set_process(not _dirty.is_empty())
 
 
-func _queue_edit(chunk: SnowChunk, index: int) -> void:
+func _queue_edit(chunk: SnowChunk, index: int, update_collision: bool) -> void:
 	_dirty[chunk.tile] = chunk
+	if update_collision and collision_enabled:
+		_collision_dirty[chunk.tile] = true
 	var side := cells_per_chunk + 1
 	var x := index % side
 	@warning_ignore("integer_division")

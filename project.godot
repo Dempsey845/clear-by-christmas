@@ -89,6 +89,10 @@ snow_use={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_2="Snow"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

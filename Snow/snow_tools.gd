@@ -31,6 +31,8 @@ var _aim_point := Vector3.ZERO
 var _stroke: Tween
 var _held_position: Vector3
 var _aim_query := PhysicsRayQueryParameters3D.new()
+var _player: CharacterBody3D
+var _spawn_position: Vector3
 
 
 func _ready() -> void:
@@ -39,6 +41,9 @@ func _ready() -> void:
 	while ancestor != null:
 		if ancestor is CollisionObject3D:
 			_aim_query.exclude = [ancestor.get_rid()]
+			_player = ancestor as CharacterBody3D
+			if _player != null:
+				_spawn_position = _player.global_position
 			break
 		ancestor = ancestor.get_parent()
 	_update_status()
@@ -57,10 +62,7 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("snow_suction"):
 		_select_tool(Tool.SUCTION)
 	if Input.is_action_just_pressed("snow_reset"):
-		for field: SnowField in get_tree().get_nodes_in_group(FIELDS_GROUP):
-			field.reset_snow()
-		_carried_volume = 0.0
-		_update_status()
+		_reset_snow()
 
 	_update_aim()
 	marker.visible = _aim_field != null
@@ -76,6 +78,22 @@ func _physics_process(delta: float) -> void:
 		_use_suction(delta)
 	else:
 		_suction_elapsed = 0.0
+
+
+func _reset_snow() -> void:
+	var buried := false
+	for field: SnowField in get_tree().get_nodes_in_group(FIELDS_GROUP):
+		field.reset_snow()
+		if _player != null and field.collision_enabled:
+			var feet := field.to_local(_player.global_position)
+			buried = buried or (feet.y >= -0.02 and field.depth_at(_player.global_position) > feet.y + 0.05)
+	if buried:
+		_player.global_position = _spawn_position
+		_player.reset_physics_interpolation()
+		_player.velocity = Vector3.ZERO
+	_carried_volume = 0.0
+	_suction_elapsed = 0.0
+	_update_status()
 
 
 func _use_suction(delta: float) -> void:
