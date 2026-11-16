@@ -1,3 +1,4 @@
+class_name SnowTools
 extends Node3D
 
 enum Tool { SHOVEL, SUCTION }
@@ -5,13 +6,14 @@ enum Tool { SHOVEL, SUCTION }
 const FIELDS_GROUP := "snow_fields"
 const SUCTION_STEP := 0.05
 const SNOW_OFFSET := 0.002
+const TANK_EPSILON := 0.000001
 
 @export var reach := 3.5
-@export var shovel_size := Vector2(0.55, 0.64)
-@export var scoop_depth := 0.18
-@export var dump_radius := 0.44
-@export var suction_size := Vector2(0.85, 1.05)
-@export var suction_depth_per_second := 0.65
+@export var starter_scoop: SnowToolData = preload("res://Tools/Catalog/starter_scoop.tres")
+@export var starter_suction: SnowToolData = preload("res://Tools/Catalog/starter_suction.tres")
+
+var equipped_scoop: SnowToolData
+var equipped_suction: SnowToolData
 
 @onready var camera := get_parent() as Camera3D
 @onready var shovel: Node3D = $HeldTool/Shovel
@@ -25,6 +27,7 @@ const SNOW_OFFSET := 0.002
 var _tool := Tool.SHOVEL
 var _carried_volume := 0.0
 var _suction_elapsed := 0.0
+var _suction_volume := 0.0
 var _particle_cooldown := 0.0
 var _aim_field: SnowField
 var _aim_point := Vector3.ZERO
@@ -36,7 +39,10 @@ var _spawn_position: Vector3
 
 
 func _ready() -> void:
+	equipped_scoop = starter_scoop
+	equipped_suction = starter_suction
 	_held_position = $HeldTool.position
+	_update_tool_appearance()
 	var ancestor := camera.get_parent()
 	while ancestor != null:
 		if ancestor is CollisionObject3D:
@@ -64,7 +70,10 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("snow_reset"):
 		_reset_snow()
 
+	var had_target := _aim_field != null
 	_update_aim()
+	if _tool == Tool.SUCTION and had_target != (_aim_field != null):
+		_update_status()
 	marker.visible = _aim_field != null
 	if _aim_field != null:
 		marker.global_basis = _aim_field.global_basis.orthonormalized()
@@ -74,6 +83,9 @@ func _physics_process(delta: float) -> void:
 	if _tool == Tool.SHOVEL:
 		if Input.is_action_just_pressed("snow_use") and _aim_field != null:
 			_use_shovel()
+	elif Input.is_action_just_pressed("snow_dump"):
+		_suction_elapsed = 0.0
+		_dump_suction()
 	elif Input.is_action_pressed("snow_use") and _aim_field != null:
 		_use_suction(delta)
 	else:
@@ -92,21 +104,43 @@ func _reset_snow() -> void:
 		_player.reset_physics_interpolation()
 		_player.velocity = Vector3.ZERO
 	_carried_volume = 0.0
+	_suction_volume = 0.0
 	_suction_elapsed = 0.0
 	_update_status()
 
 
 func _use_suction(delta: float) -> void:
+	var free_volume := _suction_free_volume()
+	if free_volume <= TANK_EPSILON:
+		return
 	_suction_elapsed += delta
 	if _suction_elapsed < SUCTION_STEP:
 		return
 	var amount := _aim_field.cut(
-		_aim_point, -camera.global_basis.z, suction_size,
-		suction_depth_per_second * _suction_elapsed, true
+		_aim_point, -camera.global_basis.z, equipped_suction.area,
+		equipped_suction.depth * _suction_elapsed, true, free_volume
 	)
 	_suction_elapsed = 0.0
-	if amount > 0.00001 and _particle_cooldown <= 0.0:
-		_emit_powder((suction.global_position - _aim_point).normalized(), true)
+	if amount > 0.0:
+		_suction_volume += amount
+		_update_status()
+		if _particle_cooldown <= 0.0:
+			_emit_powder((suction.global_position - _aim_point).normalized(), true)
+
+
+func _suction_free_volume() -> float:
+	return maxf(0.0, equipped_suction.capacity_m3() - _suction_volume)
+
+
+func _dump_suction() -> void:
+	if _suction_volume <= 0.0 or _aim_field == null:
+		return
+	if not _aim_field.contains_ground(_aim_point):
+		return
+	if _aim_field.deposit(_aim_point, equipped_suction.dump_radius, _suction_volume):
+		_suction_volume = 0.0
+		_emit_powder(Vector3.UP, false)
+		_update_status()
 
 
 func _update_aim() -> void:
@@ -166,16 +200,45 @@ func _update_aim() -> void:
 
 func _use_shovel() -> void:
 	if _carried_volume > 0.0:
-		if not _aim_field.deposit(_aim_point, dump_radius, _carried_volume):
+		if not _aim_field.deposit(_aim_point, equipped_scoop.dump_radius, _carried_volume):
 			return
 		_carried_volume = 0.0
 		_emit_powder(Vector3.UP, false)
 	else:
-		_carried_volume = _aim_field.cut(_aim_point, -camera.global_basis.z, shovel_size, scoop_depth, false)
+		_carried_volume = _aim_field.cut(
+			_aim_point, -camera.global_basis.z, equipped_scoop.area, equipped_scoop.depth,
+			false, equipped_scoop.capacity_m3()
+		)
 		if _carried_volume > 0.0:
 			_emit_powder(Vector3.UP + camera.global_basis.z * 0.6, false)
 	_animate_shovel()
 	_update_status()
+
+
+func try_equip(tool: SnowToolData) -> bool:
+	if tool.kind == SnowToolData.Kind.SCOOP:
+		if _carried_volume > 0.0:
+			return false
+		equipped_scoop = tool
+	else:
+		if _suction_volume > 0.0:
+			return false
+		equipped_suction = tool
+		_suction_elapsed = 0.0
+	_update_tool_appearance()
+	_update_status()
+	return true
+
+
+func _update_tool_appearance() -> void:
+	_tint_tool($HeldTool/Shovel/Blade, equipped_scoop.color)
+	_tint_tool($HeldTool/Suction/Housing, equipped_suction.color)
+
+
+func _tint_tool(part: MeshInstance3D, color: Color) -> void:
+	var material := part.get_active_material(0).duplicate() as StandardMaterial3D
+	material.albedo_color = color
+	part.material_override = material
 
 
 func _select_tool(tool: Tool) -> void:
@@ -190,10 +253,15 @@ func _update_status() -> void:
 	scoop.visible = _carried_volume > 0.0
 	var action := "Click to scoop"
 	if _tool == Tool.SUCTION:
-		action = "Hold left click to vacuum"
+		var controls := "LMB Vacuum  ·  RMB Dump"
+		if _suction_free_volume() <= TANK_EPSILON:
+			controls = "Tank full  ·  RMB Dump" if _aim_field != null else "Tank full  ·  Aim at a snow chunk"
+		action = "%.0f / %.0f L  ·  %s" % [_suction_volume * 1000.0, equipped_suction.capacity_litres, controls]
 	elif _carried_volume > 0.0:
 		action = "Click to dump  ·  %.0f L on shovel" % (_carried_volume * 1000.0)
-	status.text = "1  Shovel     2  Suction     R  Reset snow\n" + action
+	status.text = "1  %s     2  %s     R  Reset snow\n%s" % [
+		equipped_scoop.display_name, equipped_suction.display_name, action
+	]
 
 
 func _animate_shovel() -> void:

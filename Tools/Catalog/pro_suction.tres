@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SnowToolData" format=3]
+
+[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"pro_suction"
+display_name = "Pro Vacuum"
+kind = 1
+price = 50
+area = Vector2(1.27, 1.48)
+depth = 1.1
+capacity_litres = 560.0
+dump_radius = 1.2
+color = Color(0.28, 0.35, 0.66, 1)

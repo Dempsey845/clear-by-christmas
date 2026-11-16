@@ -10,6 +10,8 @@ var editable := PackedByteArray()
 var weights := PackedFloat32Array()
 var initial_depths := PackedFloat32Array()
 var tile: Vector2i
+var snow_volume_m3 := 0.0
+var _initial_volume_m3 := 0.0
 
 var _vertices := PackedVector3Array()
 var _normals := PackedVector3Array()
@@ -53,9 +55,11 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 			depths[index] = maxf(0.0, base_depth * (1.0 + 0.45 * noise.get_noise_2dv(point)))
 			if not editable[index]:
 				depths[index] = 0.0
+			snow_volume_m3 += depths[index] * weights[index]
 			_vertices[index] = Vector3(x * field.spacing, 0.0, z * field.spacing)
 			_uvs[index] = point
 	initial_depths = depths.duplicate()
+	_initial_volume_m3 = snow_volume_m3
 	if field.collision_enabled:
 		_create_collision(field)
 		rebuild_collision(field)
@@ -112,12 +116,16 @@ func stamp_footprint(index: int, depth: float) -> bool:
 	return true
 
 
-func clear_footprint(index: int) -> void:
+func change_depth(index: int, delta: float) -> void:
+	var previous := depths[index]
+	depths[index] = maxf(0.0, previous + delta)
+	snow_volume_m3 = maxf(0.0, snow_volume_m3 + (depths[index] - previous) * weights[index])
 	_footprints[index] = 0.0
 
 
 func reset_depths() -> void:
 	depths = initial_depths.duplicate()
+	snow_volume_m3 = _initial_volume_m3
 	_footprints.fill(0.0)
 
 

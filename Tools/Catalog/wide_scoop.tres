@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SnowToolData" format=3]
+
+[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"wide_scoop"
+display_name = "Wide Scoop"
+kind = 0
+price = 10
+area = Vector2(0.72, 0.81)
+depth = 0.23
+capacity_litres = 65.0
+dump_radius = 0.54
+color = Color(0.38, 0.61, 0.69, 1)

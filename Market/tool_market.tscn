@@ -1,0 +1,194 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Market/tool_market.gd" id="1"]
+
+[sub_resource type="StandardMaterial3D" id="wood"]
+albedo_color = Color(0.31, 0.17, 0.10, 1)
+
+[sub_resource type="StandardMaterial3D" id="red"]
+albedo_color = Color(0.53, 0.15, 0.13, 1)
+
+[sub_resource type="StandardMaterial3D" id="cream"]
+albedo_color = Color(0.82, 0.76, 0.58, 1)
+
+[sub_resource type="StyleBoxFlat" id="panel"]
+bg_color = Color(0.048, 0.11, 0.092, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.29, 0.43, 0.35, 1)
+corner_radius_top_left = 17
+corner_radius_top_right = 17
+corner_radius_bottom_left = 17
+corner_radius_bottom_right = 17
+content_margin_left = 22.0
+content_margin_right = 22.0
+content_margin_top = 16.0
+content_margin_bottom = 16.0
+
+[node name="ToolMarket" type="Node3D"]
+process_mode = 3
+script = ExtResource("1")
+
+[node name="Stall" type="CSGCombiner3D" parent="."]
+use_collision = true
+
+[node name="CounterBase" type="CSGBox3D" parent="Stall"]
+position = Vector3(0, 0.49, -0.48)
+size = Vector3(2.56, 0.98, 0.94)
+material = SubResource("red")
+
+[node name="CounterTop" type="CSGBox3D" parent="Stall"]
+position = Vector3(0, 1.01, -0.48)
+size = Vector3(2.77, 0.13, 1.08)
+material = SubResource("wood")
+
+[node name="LeftPost" type="CSGBox3D" parent="Stall"]
+position = Vector3(-1.23, 1.60, -0.84)
+size = Vector3(0.13, 2.05, 0.15)
+material = SubResource("wood")
+
+[node name="RightPost" type="CSGBox3D" parent="Stall"]
+position = Vector3(1.23, 1.60, -0.84)
+size = Vector3(0.13, 2.05, 0.15)
+material = SubResource("wood")
+
+[node name="Awning" type="CSGBox3D" parent="Stall"]
+position = Vector3(0, 2.58, -0.49)
+rotation_degrees = Vector3(12, 0, 0)
+size = Vector3(2.90, 0.15, 1.48)
+material = SubResource("red")
+
+[node name="LeftStripe" type="CSGBox3D" parent="Stall"]
+position = Vector3(-0.94, 2.62, -0.49)
+rotation_degrees = Vector3(12, 0, 0)
+size = Vector3(0.32, 0.16, 1.48)
+material = SubResource("cream")
+
+[node name="MiddleStripe" type="CSGBox3D" parent="Stall"]
+position = Vector3(0, 2.62, -0.49)
+rotation_degrees = Vector3(12, 0, 0)
+size = Vector3(0.32, 0.16, 1.48)
+material = SubResource("cream")
+
+[node name="RightStripe" type="CSGBox3D" parent="Stall"]
+position = Vector3(0.94, 2.62, -0.49)
+rotation_degrees = Vector3(12, 0, 0)
+size = Vector3(0.32, 0.16, 1.48)
+material = SubResource("cream")
+
+[node name="SignBoard" type="CSGBox3D" parent="Stall"]
+position = Vector3(0, 2.13, -0.73)
+size = Vector3(2.57, 0.37, 0.14)
+material = SubResource("wood")
+
+[node name="Sign" type="Label3D" parent="."]
+position = Vector3(0, 2.13, -0.65)
+text = "TOOL MARKET"
+font_size = 52
+pixel_size = 0.0045
+outline_size = 0
+modulate = Color(0.99, 0.91, 0.73, 1)
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Prompt" type="Label" parent="UI"]
+unique_name_in_owner = true
+visible = false
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -155.0
+offset_top = -83.0
+offset_right = 155.0
+offset_bottom = -51.0
+horizontal_alignment = 1
+theme_override_colors/font_outline_color = Color(0.025, 0.065, 0.05, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 21
+text = "E   Shop for tools"
+
+[node name="Shop" type="ColorRect" parent="UI"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.014, 0.027, 0.021, 0.78)
+
+[node name="Panel" type="PanelContainer" parent="UI/Shop"]
+anchor_left = 0.18
+anchor_top = 0.06
+anchor_right = 0.82
+anchor_bottom = 0.94
+theme_override_styles/panel = SubResource("panel")
+
+[node name="Content" type="VBoxContainer" parent="UI/Shop/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="Header" type="HBoxContainer" parent="UI/Shop/Panel/Content"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="UI/Shop/Panel/Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 27
+text = "Tool Market"
+
+[node name="Balance" type="Label" parent="UI/Shop/Panel/Content/Header"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.92, 0.71, 1)
+theme_override_font_sizes/font_size = 19
+
+[node name="Close" type="Button" parent="UI/Shop/Panel/Content/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(68, 36)
+layout_mode = 2
+text = "Close"
+
+[node name="List" type="ScrollContainer" parent="UI/Shop/Panel/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Categories" type="VBoxContainer" parent="UI/Shop/Panel/Content/List"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 11
+
+[node name="Scoops" type="VBoxContainer" parent="UI/Shop/Panel/Content/List/Categories"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Heading" type="Label" parent="UI/Shop/Panel/Content/List/Categories/Scoops"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.81, 0.72, 1)
+theme_override_font_sizes/font_size = 17
+text = "Scoops"
+
+[node name="Suction" type="VBoxContainer" parent="UI/Shop/Panel/Content/List/Categories"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Heading" type="Label" parent="UI/Shop/Panel/Content/List/Categories/Suction"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.64, 0.81, 0.72, 1)
+theme_override_font_sizes/font_size = 17
+text = "Suction tools"
+
+[node name="Feedback" type="Label" parent="UI/Shop/Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.92, 0.84, 1)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3

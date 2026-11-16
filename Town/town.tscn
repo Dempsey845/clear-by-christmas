@@ -4,6 +4,20 @@
 [ext_resource type="PackedScene" path="res://Snow/snow_field.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://Snow/snow_chunk.tscn" id="3"]
 
+[ext_resource type="PackedScene" path="res://Jobs/job_board.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://Jobs/snow_job_site.tscn" id="5"]
+[ext_resource type="Resource" path="res://Jobs/Requests/12_holly_lane.tres" id="6"]
+[ext_resource type="Resource" path="res://Jobs/Requests/18_holly_lane.tres" id="7"]
+[ext_resource type="Script" path="res://Jobs/snow_job.gd" id="8"]
+[ext_resource type="PackedScene" path="res://Jobs/sample_house.tscn" id="9"]
+
+[ext_resource type="PackedScene" path="res://Market/tool_market.tscn" id="10"]
+[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="11"]
+[ext_resource type="Resource" path="res://Tools/Catalog/wide_scoop.tres" id="12"]
+[ext_resource type="Resource" path="res://Tools/Catalog/drift_scoop.tres" id="13"]
+[ext_resource type="Resource" path="res://Tools/Catalog/power_suction.tres" id="14"]
+[ext_resource type="Resource" path="res://Tools/Catalog/pro_suction.tres" id="15"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k1v75"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -55,3 +69,41 @@ initial_depth = 0.33
 [node name="SidePath" parent="RoadSnow" unique_id=1394625358 instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
 initial_depth = 0.24
+
+
+[node name="Holly12" parent="." instance=ExtResource("9")]
+position = Vector3(4, 0, -10.28)
+
+[node name="Holly18" parent="." instance=ExtResource("9")]
+position = Vector3(-6, 0, -13.28)
+
+[node name="Holly18Snow" parent="." instance=ExtResource("2")]
+position = Vector3(-10, 0, -12)
+
+[node name="LawnWest" parent="Holly18Snow" instance=ExtResource("3")]
+initial_depth = 0.32
+
+[node name="LawnEast" parent="Holly18Snow" instance=ExtResource("3")]
+position = Vector3(4, 0, 0)
+initial_depth = 0.42
+
+[node name="Holly12JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
+position = Vector3(4, 0, -7)
+site_id = &"holly_12"
+lawn_chunks = [NodePath("../RoadSnow/SidePath")]
+
+[node name="Holly18JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
+position = Vector3(-6, 0, -10)
+site_id = &"holly_18"
+lawn_chunks = [NodePath("../Holly18Snow/LawnWest"), NodePath("../Holly18Snow/LawnEast")]
+
+[node name="JobBoard" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4")]
+player = NodePath("../Player")
+requests = Array[ExtResource("8")]([ExtResource("6"), ExtResource("7")])
+
+[node name="ToolMarket" parent="." node_paths=PackedStringArray("player", "snow_tools", "job_board") instance=ExtResource("10")]
+position = Vector3(4, 0, -1.55)
+player = NodePath("../Player")
+snow_tools = NodePath("../Player/Head/Camera3D/SnowTools")
+job_board = NodePath("../JobBoard")
+catalog = Array[ExtResource("11")]([ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15")])
