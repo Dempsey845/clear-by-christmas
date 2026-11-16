@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://lt225bdkerps" path="res://Player/player.gd" id="1_4ntmi"]
 [ext_resource type="Script" uid="uid://fs4vvsidq4te" path="res://Player/player_movement.gd" id="2_btcbx"]
+[ext_resource type="PackedScene" path="res://Snow/snow_tools.tscn" id="3_btcbx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xrivr"]
 
@@ -23,3 +24,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 
 [node name="Camera3D" type="Camera3D" parent="Head/SpringArm3D" unique_id=458523089]
 unique_name_in_owner = true
+
+[node name="SnowTools" parent="Head/SpringArm3D/Camera3D" unique_id=1708020119 instance=ExtResource("3_btcbx")]

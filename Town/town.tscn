@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://co8agcwwxlu85"]
 
 [ext_resource type="PackedScene" uid="uid://bvllvr25njqo1" path="res://Player/player.tscn" id="1_k1v75"]
+[ext_resource type="PackedScene" path="res://Snow/snow_field.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://Snow/snow_chunk.tscn" id="3"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k1v75"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -35,3 +37,21 @@ size = Vector3(100, 1, 100)
 material = SubResource("StandardMaterial3D_xqlys")
 
 [node name="Player" parent="." unique_id=2118284816 instance=ExtResource("1_k1v75")]
+
+[node name="RoadSnow" parent="." unique_id=683135024 instance=ExtResource("2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
+
+[node name="RoadNear" parent="RoadSnow" unique_id=1007323244 instance=ExtResource("3")]
+initial_depth = 0.28
+
+[node name="RoadDrift" parent="RoadSnow" unique_id=30475574 instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
+initial_depth = 0.46
+
+[node name="RoadFar" parent="RoadSnow" unique_id=1769406772 instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+initial_depth = 0.33
+
+[node name="SidePath" parent="RoadSnow" unique_id=1394625358 instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
+initial_depth = 0.24

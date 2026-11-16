@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Snow/snow_field.gd" id="1"]
+
+[node name="SnowField" type="Node3D" groups=["snow_fields"]]
+script = ExtResource("1")
