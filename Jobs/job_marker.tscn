@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[node name="JobMarker" type="Node3D"]
+top_level = true
+visible = false
+
+[node name="Address" type="Label3D" parent="."]
+pixel_size = 0.0032
+billboard = 1
+no_depth_test = true
+fixed_size = true
+font_size = 34
+outline_size = 13
+modulate = Color(0.83, 0.98, 0.87, 1)
+outline_modulate = Color(0.025, 0.09, 0.06, 1)
+
+[node name="Pin" type="Label3D" parent="."]
+pixel_size = 0.0032
+billboard = 1
+no_depth_test = true
+fixed_size = true
+offset = Vector2(0, -38)
+text = "▼"
+font_size = 30
+outline_size = 13
+modulate = Color(0.50, 0.91, 0.63, 1)
+outline_modulate = Color(0.025, 0.09, 0.06, 1)

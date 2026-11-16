@@ -1,6 +1,8 @@
 class_name SnowField
 extends Node3D
 
+signal snow_amount_changed
+
 const COLLISION_LAYER := 1 << 1
 
 @export var collision_enabled := true
@@ -134,16 +136,18 @@ func cut(point: Vector3, forward: Vector3, size: Vector2, depth: float, rounded:
 		var amount := minf(chunk.depths[index], depth * strength)
 		if amount <= 0.0:
 			continue
-		chunk.depths[index] -= amount
-		chunk.clear_footprint(index)
+		chunk.change_depth(index, -amount)
 		removed += amount * chunk.weights[index]
 		_queue_edit(chunk, index, true)
 	if removed > 0.0:
 		set_process(true)
+		snow_amount_changed.emit()
 	return removed
 
 
 func deposit(point: Vector3, radius: float, volume: float) -> bool:
+	if volume <= 0.0:
+		return false
 	var brush := _brush(point, Vector3.FORWARD, Vector2.ONE * radius * 2.0, true)
 	var area := 0.0
 	for sample in brush:
@@ -155,10 +159,10 @@ func deposit(point: Vector3, radius: float, volume: float) -> bool:
 	for sample in brush:
 		var chunk: SnowChunk = sample[0]
 		var index: int = sample[1]
-		chunk.depths[index] += volume * float(sample[2]) / area
-		chunk.clear_footprint(index)
+		chunk.change_depth(index, volume * float(sample[2]) / area)
 		_queue_edit(chunk, index, true)
 	set_process(true)
+	snow_amount_changed.emit()
 	return true
 
 
@@ -181,6 +185,7 @@ func reset_snow() -> void:
 			_collision_dirty[chunk.tile] = true
 		_dirty[chunk.tile] = chunk
 	set_process(not _dirty.is_empty())
+	snow_amount_changed.emit()
 
 
 func _queue_edit(chunk: SnowChunk, index: int, update_collision: bool) -> void:
