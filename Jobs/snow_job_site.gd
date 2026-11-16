@@ -38,6 +38,13 @@ func snow_volume_m3() -> float:
 	return volume
 
 
+func fresh_snow_volume_m3(multiplier: float) -> float:
+	var volume := 0.0
+	for chunk in _chunks:
+		volume += chunk.base_snow_volume_m3 * multiplier
+	return volume
+
+
 func lawn_area_m2() -> float:
 	var area := 0.0
 	for chunk in _chunks:

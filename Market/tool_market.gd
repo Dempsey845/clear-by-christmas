@@ -19,21 +19,20 @@ func _ready() -> void:
 	%Close.pressed.connect(_close)
 	job_board.balance_changed.connect(_refresh_cards)
 	_add_card(snow_tools.starter_scoop, true)
-	_add_card(snow_tools.starter_suction, true)
 	for tool in catalog:
 		_add_card(tool, false)
 	_refresh_cards(job_board.balance)
 
 
 func _process(_delta: float) -> void:
-	%Prompt.visible = not _open and not get_tree().paused and _in_range()
+	%Prompt.visible = not _open and not get_tree().paused and not job_board.hud.phone_open and _in_range()
 
 
 func _input(event: InputEvent) -> void:
 	if _open and (event.is_action_pressed("market_interact") or event.is_action_pressed("pause")):
 		_close()
 		get_viewport().set_input_as_handled()
-	elif not _open and not get_tree().paused and event.is_action_pressed("market_interact") and _in_range():
+	elif not _open and not get_tree().paused and event.is_action_pressed("market_interact") and not job_board.hud.phone_open and _in_range():
 		_show_market()
 		get_viewport().set_input_as_handled()
 
@@ -92,3 +91,28 @@ func _refresh_cards(balance: int) -> void:
 	for card in _cards:
 		var equipped := card.tool == snow_tools.equipped_scoop or card.tool == snow_tools.equipped_suction
 		card.update_action(_owned[card.tool.id], equipped, balance)
+
+
+func owned_items() -> Array[String]:
+	var items: Array[String] = []
+	for id in _owned:
+		if _owned[id]:
+			items.append(String(id))
+	return items
+
+
+func restore_items(items: Array, tools: Dictionary) -> void:
+	var scoop_tool: SnowToolData
+	var suction_tool: SnowToolData
+	for card in _cards:
+		var tool := card.tool
+		var id := String(tool.id)
+		_owned[tool.id] = tool == snow_tools.starter_scoop or id in items
+		if not _owned[tool.id]:
+			continue
+		if id == tools.get("scoop", "") and tool.kind == SnowToolData.Kind.SCOOP:
+			scoop_tool = tool
+		if id == tools.get("suction", "") and tool.kind == SnowToolData.Kind.SUCTION:
+			suction_tool = tool
+	snow_tools.restore_state(tools, scoop_tool, suction_tool)
+	_refresh_cards(job_board.balance)

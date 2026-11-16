@@ -34,6 +34,7 @@ extends Node
 var default_camera_position: Vector3
 
 var camera_pitch: float = 0.0
+var controls_locked := false
 
 var _head_rest_position: Vector3
 var _step_camera_offset := Vector3.ZERO
@@ -51,6 +52,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if controls_locked:
+		return
 	if (
 		OS.has_feature("web")
 		and not get_tree().paused
@@ -74,9 +77,9 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	_apply_gravity(delta)
 	_update_camera_offset(delta)
-	_apply_controller_look(delta)
-
-	_handle_jump()
+	if not controls_locked:
+		_apply_controller_look(delta)
+		_handle_jump()
 	_handle_movement(delta)
 
 	var start := body.global_position
@@ -173,7 +176,7 @@ func _handle_movement(delta: float) -> void:
 		"move_right",
 		"move_forward",
 		"move_backward"
-	)
+	) if not controls_locked else Vector2.ZERO
 
 	var local_direction: Vector3 = Vector3(
 		input_direction.x,
@@ -283,3 +286,16 @@ func _toggle_mouse_capture() -> void:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	else:
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+
+func place(position: Vector3, yaw: float, pitch: float) -> void:
+	body.global_position = position
+	body.rotation.y = yaw
+	body.velocity = Vector3.ZERO
+	camera_pitch = pitch
+	head.rotation.x = pitch
+	_step_camera_offset = Vector3.ZERO
+	_distance_since_print = 0.0
+	head.position = _head_rest_position
+	body.reset_physics_interpolation()

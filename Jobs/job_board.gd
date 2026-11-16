@@ -4,21 +4,24 @@ extends Node
 signal balance_changed(amount: int)
 signal job_completed(job: SnowJob)
 
+const LAST_DAY := 25
+
 @export var player: Node3D
 @export var requests: Array[SnowJob]
 @export_range(0.0, 10.0, 0.25) var marker_hide_distance := 2.25
-@export_range(0.5, 15.0, 0.5) var next_job_delay := 4.0
 
 @onready var hud: JobHUD = $JobHUD
 @onready var marker: Node3D = $JobMarker
-@onready var next_request: Timer = $NextRequest
 
-var balance: int:
+var balance := 0
+var day := 1
+var player_indoors := false
+var day_finished: bool:
 	get:
-		return _balance
+		return _request_index >= requests.size()
 
-var _balance := 0
-var _next_index := 0
+var _request_index := 0
+var _history: Array[Dictionary] = []
 var _sites: Dictionary[StringName, SnowJobSite] = {}
 var _job: SnowJob
 var _site: SnowJobSite
@@ -27,9 +30,19 @@ var _starting_volume := 0.0
 
 func _ready() -> void:
 	set_physics_process(false)
-	hud.set_balance(balance)
-	next_request.timeout.connect(_assign_next)
-	_find_sites.call_deferred()
+	hud.accept_requested.connect(accept_job)
+
+
+func prepare() -> void:
+	for node in get_tree().get_nodes_in_group("snow_job_sites"):
+		var site := node as SnowJobSite
+		if site == null or site.site_id == &"" or not site.prepare():
+			continue
+		if _sites.has(site.site_id):
+			push_warning("Duplicate snow job site: %s" % site.site_id)
+			continue
+		_sites[site.site_id] = site
+	_show_request()
 
 
 func _physics_process(_delta: float) -> void:
@@ -43,51 +56,78 @@ func try_spend(amount: int) -> bool:
 	return true
 
 
-func _find_sites() -> void:
-	for node in get_tree().get_nodes_in_group("snow_job_sites"):
-		var site := node as SnowJobSite
-		if site == null or site.site_id == &"" or not site.prepare():
-			continue
-		if _sites.has(site.site_id):
-			push_warning("Duplicate snow job site: %s" % site.site_id)
-			continue
-		_sites[site.site_id] = site
-	_assign_next()
-
-
-func _assign_next() -> void:
-	while _next_index < requests.size():
-		var request := requests[_next_index]
-		_next_index += 1
-		if request == null:
-			continue
-		var site := _sites.get(request.site_id) as SnowJobSite
-		if site == null:
-			push_warning("Missing snow job site: %s" % request.site_id)
-			continue
-		var volume := site.snow_volume_m3()
-		if volume > 0.01:
-			_start_job(request, site, volume)
-			return
-	hud.show_no_requests()
-
-
-func _start_job(request: SnowJob, site: SnowJobSite, volume: float) -> void:
+func accept_job() -> void:
+	if _job != null or day_finished:
+		return
+	var request := requests[_request_index]
+	var site := _sites.get(request.site_id) as SnowJobSite
+	if site == null:
+		return
 	_job = request
 	_site = site
-	_starting_volume = volume
+	_starting_volume = site.fresh_snow_volume_m3(snow_multiplier())
 	for field in site.fields():
-		# Read progress after every part of a snow edit has been applied.
 		field.snow_amount_changed.connect(_refresh_progress, CONNECT_DEFERRED)
 	marker.global_position = site.get_node("MarkerPosition").global_position
 	$JobMarker/Address.text = request.address
-	hud.show_assignment(request, site.lawn_area_m2(), site.chunk_count(), volume)
+	hud.show_assignment(request, site.lawn_area_m2(), _starting_volume)
 	_update_marker()
 	set_physics_process(true)
+	_refresh_progress()
+
+
+func advance_day() -> void:
+	if not day_finished or day >= LAST_DAY:
+		return
+	day += 1
+	_request_index = 0
+	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
+		field.reset_snow(snow_multiplier())
+	_show_request()
+
+
+func snow_multiplier() -> float:
+	return snow_multiplier_for_day(day)
+
+
+static func snow_multiplier_for_day(date: int) -> float:
+	return 1.0 + (date - 1) * 0.04
+
+
+func save_state() -> Dictionary:
+	return {
+		"balance": balance, "day": day, "request_index": _request_index,
+		"accepted": _job != null, "history": _history,
+	}
+
+
+func restore_state(state: Dictionary) -> void:
+	_clear_assignment()
+	day = clampi(state.get("day", 1), 1, LAST_DAY)
+	_request_index = clampi(state.get("request_index", 0), 0, requests.size())
+	_history.assign(state.get("history", []))
+	_change_balance(int(state.get("balance", 0)) - balance)
+	hud.clear_notice()
+	_show_request()
+	if state.get("accepted", false):
+		accept_job()
+
+
+func _show_request() -> void:
+	hud.set_day(day, day_finished, LAST_DAY)
+	hud.set_history(_history)
+	if day_finished:
+		hud.show_day_finished(day == LAST_DAY)
+		return
+	var request := requests[_request_index]
+	var site := _sites.get(request.site_id) as SnowJobSite
+	if site != null:
+		hud.show_offer(request, site.lawn_area_m2(), site.fresh_snow_volume_m3(snow_multiplier()))
 
 
 func _update_marker() -> void:
-	marker.visible = is_instance_valid(player) and _site.distance_to_lawn(player.global_position) > marker_hide_distance
+	marker.visible = not player_indoors \
+		and _site.distance_to_lawn(player.global_position) > marker_hide_distance
 
 
 func _refresh_progress() -> void:
@@ -100,22 +140,28 @@ func _refresh_progress() -> void:
 		_complete_job()
 
 
-func _complete_job() -> void:
-	var completed := _job
-	for field in _site.fields():
-		field.snow_amount_changed.disconnect(_refresh_progress)
+func _clear_assignment() -> void:
+	if _site != null:
+		for field in _site.fields():
+			field.snow_amount_changed.disconnect(_refresh_progress)
 	_job = null
 	_site = null
 	marker.hide()
 	set_physics_process(false)
 
+
+func _complete_job() -> void:
+	var completed := _job
+	_clear_assignment()
+	_history.append({"day": day, "address": completed.address, "pay": completed.pay})
+	_request_index += 1
 	_change_balance(completed.pay)
-	hud.show_completed(completed)
+	_show_request()
+	hud.notify_payment(completed)
 	job_completed.emit(completed)
-	next_request.start(next_job_delay)
 
 
 func _change_balance(amount: int) -> void:
-	_balance += amount
+	balance += amount
 	hud.set_balance(balance)
 	balance_changed.emit(balance)

@@ -11,7 +11,7 @@ var weights := PackedFloat32Array()
 var initial_depths := PackedFloat32Array()
 var tile: Vector2i
 var snow_volume_m3 := 0.0
-var _initial_volume_m3 := 0.0
+var base_snow_volume_m3 := 0.0
 
 var _vertices := PackedVector3Array()
 var _normals := PackedVector3Array()
@@ -59,7 +59,7 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 			_vertices[index] = Vector3(x * field.spacing, 0.0, z * field.spacing)
 			_uvs[index] = point
 	initial_depths = depths.duplicate()
-	_initial_volume_m3 = snow_volume_m3
+	base_snow_volume_m3 = snow_volume_m3
 	if field.collision_enabled:
 		_create_collision(field)
 		rebuild_collision(field)
@@ -123,10 +123,32 @@ func change_depth(index: int, delta: float) -> void:
 	_footprints[index] = 0.0
 
 
-func reset_depths() -> void:
+func reset_depths(multiplier: float) -> void:
 	depths = initial_depths.duplicate()
-	snow_volume_m3 = _initial_volume_m3
+	if multiplier != 1.0:
+		for index in depths.size():
+			depths[index] *= multiplier
+	snow_volume_m3 = base_snow_volume_m3 * multiplier
 	_footprints.fill(0.0)
+
+
+func save_state() -> Dictionary:
+	return {"depths": depths, "footprints": _footprints}
+
+
+func restore_state(state: Dictionary, multiplier: float) -> void:
+	var saved_depths: Variant = state.get("depths")
+	var saved_footprints: Variant = state.get("footprints")
+	if saved_depths is not PackedFloat32Array or saved_depths.size() != depths.size():
+		reset_depths(multiplier)
+		return
+	depths = saved_depths
+	_footprints.fill(0.0)
+	if saved_footprints is PackedFloat32Array and saved_footprints.size() == depths.size():
+		_footprints = saved_footprints
+	snow_volume_m3 = 0.0
+	for index in depths.size():
+		snow_volume_m3 += depths[index] * weights[index]
 
 
 func _create_collision(field: SnowField) -> void:

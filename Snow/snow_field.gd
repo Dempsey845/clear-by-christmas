@@ -193,11 +193,23 @@ func stamp_footprint(point: Vector3, forward: Vector3, size: Vector2, depth: flo
 		set_process(true)
 
 
-func reset_snow() -> void:
+func reset_snow(multiplier: float) -> void:
+	restore_state({}, multiplier)
+
+
+func save_state() -> Dictionary:
+	var state := {}
 	for chunk in _chunks.values():
-		chunk.reset_depths()
+		state[String(chunk.name)] = chunk.save_state()
+	return state
+
+
+func restore_state(state: Dictionary, multiplier: float) -> void:
+	for chunk in _chunks.values():
+		chunk.restore_state(state.get(String(chunk.name), {}), multiplier)
 		if collision_enabled:
-			_collision_dirty[chunk.tile] = true
+			chunk.rebuild_collision(self)
+		_collision_dirty.erase(chunk.tile)
 		_dirty[chunk.tile] = chunk
 	set_process(not _dirty.is_empty())
 	snow_amount_changed.emit()

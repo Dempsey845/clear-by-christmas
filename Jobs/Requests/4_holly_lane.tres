@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="SnowJob" format=3]
+
+[ext_resource type="Script" path="res://Jobs/snow_job.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+site_id = &"holly_4"
+client_name = "Nora Bell"
+address = "4 Holly Lane"
+pay = 6
+required_clear_percent = 85

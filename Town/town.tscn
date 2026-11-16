@@ -18,14 +18,23 @@
 [ext_resource type="Resource" path="res://Tools/Catalog/power_suction.tres" id="14"]
 [ext_resource type="Resource" path="res://Tools/Catalog/pro_suction.tres" id="15"]
 
+[ext_resource type="Script" path="res://Town/town.gd" id="16"]
+[ext_resource type="Resource" path="res://Tools/Catalog/compact_vacuum.tres" id="17"]
+[ext_resource type="Resource" path="res://Jobs/Requests/4_holly_lane.tres" id="18"]
+[ext_resource type="Resource" path="res://Jobs/Requests/8_holly_lane.tres" id="19"]
+[ext_resource type="PackedScene" path="res://Town/home_interior.tscn" id="20"]
+
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k1v75"]
+resource_local_to_scene = true
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 
 [sub_resource type="Sky" id="Sky_nnixl"]
+resource_local_to_scene = true
 sky_material = SubResource("ProceduralSkyMaterial_k1v75")
 
 [sub_resource type="Environment" id="Environment_f2mr4"]
+resource_local_to_scene = true
 background_mode = 2
 sky = SubResource("Sky_nnixl")
 glow_enabled = true
@@ -34,6 +43,7 @@ glow_enabled = true
 albedo_color = Color(0.27387273, 0.27387273, 0.27387273, 1)
 
 [node name="Town" type="Node3D" unique_id=1472099968]
+script = ExtResource("16")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1545012486]
 environment = SubResource("Environment_f2mr4")
@@ -71,6 +81,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
 initial_depth = 0.24
 
 
+[node name="Holly12Dump" parent="RoadSnow" instance=ExtResource("3")]
+position = Vector3(8, 0, -4)
+initial_depth = 0.0
+
 [node name="Holly12" parent="." instance=ExtResource("9")]
 position = Vector3(4, 0, -10.28)
 
@@ -87,6 +101,10 @@ initial_depth = 0.32
 position = Vector3(4, 0, 0)
 initial_depth = 0.42
 
+[node name="Dump" parent="Holly18Snow" instance=ExtResource("3")]
+position = Vector3(4, 0, 4)
+initial_depth = 0.0
+
 [node name="Holly12JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
 position = Vector3(4, 0, -7)
 site_id = &"holly_12"
@@ -97,13 +115,131 @@ position = Vector3(-6, 0, -10)
 site_id = &"holly_18"
 lawn_chunks = [NodePath("../Holly18Snow/LawnWest"), NodePath("../Holly18Snow/LawnEast")]
 
+[node name="Holly4" parent="." instance=ExtResource("9")]
+position = Vector3(10.25, 0, -5.45)
+
+[node name="Holly4Snow" parent="." instance=ExtResource("2")]
+position = Vector3(9.0, 0, -4.0)
+chunk_size = 2.5
+drift_seed = 32
+
+[node name="Lawn" parent="Holly4Snow" instance=ExtResource("3")]
+initial_depth = 0.045
+
+[node name="Dump" parent="Holly4Snow" instance=ExtResource("3")]
+position = Vector3(2.5, 0, 0)
+initial_depth = 0.0
+
+[node name="Holly4JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
+position = Vector3(10.25, 0, -2.75)
+site_id = &"holly_4"
+lawn_chunks = [NodePath("../Holly4Snow/Lawn")]
+
+[node name="Holly8" parent="." instance=ExtResource("9")]
+position = Vector3(19.5, 0, -5.95)
+
+[node name="Holly8Snow" parent="." instance=ExtResource("2")]
+position = Vector3(18.0, 0, -4.5)
+chunk_size = 3.0
+drift_seed = 36
+
+[node name="Lawn" parent="Holly8Snow" instance=ExtResource("3")]
+initial_depth = 0.085
+
+[node name="Dump" parent="Holly8Snow" instance=ExtResource("3")]
+position = Vector3(3.0, 0, 0)
+initial_depth = 0.0
+
+[node name="Holly8JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
+position = Vector3(19.5, 0, -3.0)
+site_id = &"holly_8"
+lawn_chunks = [NodePath("../Holly8Snow/Lawn")]
+
+[node name="Holly4DumpSign" type="Label3D" parent="."]
+position = Vector3(12.75, 0.8, -2.75)
+billboard = 1
+pixel_size = 0.006
+modulate = Color(0.85, 0.95, 1, 1)
+text = "Snow pile"
+font_size = 28
+outline_size = 8
+
+[node name="Holly8DumpSign" type="Label3D" parent="."]
+position = Vector3(22.5, 0.8, -3)
+billboard = 1
+pixel_size = 0.006
+modulate = Color(0.85, 0.95, 1, 1)
+text = "Snow pile"
+font_size = 28
+outline_size = 8
+
+[node name="Holly12DumpSign" type="Label3D" parent="."]
+position = Vector3(8, 0.8, -7)
+billboard = 1
+pixel_size = 0.006
+modulate = Color(0.85, 0.95, 1, 1)
+text = "Snow pile"
+font_size = 28
+outline_size = 8
+
+[node name="Holly18DumpSign" type="Label3D" parent="."]
+position = Vector3(-4, 0.8, -6)
+billboard = 1
+pixel_size = 0.006
+modulate = Color(0.85, 0.95, 1, 1)
+text = "Snow pile"
+font_size = 28
+outline_size = 8
+
 [node name="JobBoard" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4")]
 player = NodePath("../Player")
-requests = Array[ExtResource("8")]([ExtResource("6"), ExtResource("7")])
+requests = Array[ExtResource("8")]([ExtResource("18"), ExtResource("19"), ExtResource("6"), ExtResource("7")])
 
 [node name="ToolMarket" parent="." node_paths=PackedStringArray("player", "snow_tools", "job_board") instance=ExtResource("10")]
 position = Vector3(4, 0, -1.55)
 player = NodePath("../Player")
 snow_tools = NodePath("../Player/Head/Camera3D/SnowTools")
 job_board = NodePath("../JobBoard")
-catalog = Array[ExtResource("11")]([ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15")])
+catalog = Array[ExtResource("11")]([ExtResource("12"), ExtResource("13"), ExtResource("17"), ExtResource("14"), ExtResource("15")])
+
+[node name="PlayerHouse" parent="." instance=ExtResource("9")]
+position = Vector3(4, 0, 8)
+
+[node name="HomeSign" type="Label3D" parent="PlayerHouse"]
+position = Vector3(0, 2.55, 1.28)
+pixel_size = 0.009
+text = "YOUR HOUSE"
+font_size = 32
+outline_size = 8
+
+[node name="HomeMarker" type="Label3D" parent="."]
+visible = false
+position = Vector3(4, 3.55, 8)
+billboard = 1
+no_depth_test = true
+fixed_size = true
+pixel_size = 0.0032
+font_size = 34
+outline_size = 13
+modulate = Color(1, 0.86, 0.62, 1)
+outline_modulate = Color(0.14, 0.08, 0.04, 1)
+text = "Your house"
+
+[node name="HomeDoor" type="Marker3D" parent="."]
+position = Vector3(4, 0, 9.75)
+
+[node name="HomeInterior" parent="." instance=ExtResource("20")]
+position = Vector3(128, 0, 0)
+
+[node name="HomeHUD" type="CanvasLayer" parent="."]
+
+[node name="Prompt" type="Label" parent="HomeHUD"]
+anchor_left = 0.0
+anchor_top = 0.68
+anchor_right = 1.0
+anchor_bottom = 0.68
+horizontal_alignment = 1
+mouse_filter = 2
+theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.14, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 21

@@ -4,10 +4,10 @@
 
 [resource]
 script = ExtResource("1")
-id = &"starter_suction"
-display_name = "Starter Vacuum"
+id = &"compact_vacuum"
+display_name = "Compact Vacuum"
 kind = 1
-price = 0
+price = 18
 area = Vector2(0.85, 1.05)
 depth = 0.65
 capacity_litres = 240.0

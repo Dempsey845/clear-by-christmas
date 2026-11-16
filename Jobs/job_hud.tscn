@@ -75,7 +75,7 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -187.0
+offset_left = -250.0
 offset_top = 16.0
 offset_right = -20.0
 offset_bottom = 72.0
@@ -96,7 +96,23 @@ theme_override_font_sizes/font_size = 19
 text = "Balance  £0"
 horizontal_alignment = 2
 
+[node name="Date" type="Label" parent="Overlay/Wallet/Lines"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 16
+text = "December 1"
+
+[node name="DayStatus" type="Label" parent="Overlay/Wallet/Lines"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+
 [node name="PhoneKey" type="Label" parent="Overlay/Wallet/Lines" unique_id=934310174]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.69, 0.81, 0.73, 1)
 theme_override_font_sizes/font_size = 13
@@ -160,8 +176,8 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -334.0
-offset_top = -364.0
+offset_left = -325.0
+offset_top = -410.0
 offset_right = -20.0
 offset_bottom = -20.0
 grow_horizontal = 0
@@ -173,12 +189,8 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.30600002
-anchor_right = 0.30600002
-offset_left = -0.08400726
-offset_right = 217.91599
-offset_bottom = 344.0
-mouse_filter = 2
+anchor_right = 1.0
+offset_bottom = 390.0
 theme_override_styles/panel = SubResource("body")
 
 [node name="Shell" type="VBoxContainer" parent="Overlay/PhoneAnchor/Phone" unique_id=790073097]
@@ -204,25 +216,45 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="PhoneHeading" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=1812682497]
+[node name="Tabs" type="HBoxContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content"]
+layout_mode = 2
+
+[node name="JobsTab" type="Button" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Jobs"
+
+[node name="HistoryTab" type="Button" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/Tabs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "History"
+
+[node name="JobDetails" type="VBoxContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PhoneHeading" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=1812682497]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.89, 0.73, 1)
 theme_override_font_sizes/font_size = 15
-text = "No pending jobs"
+text = "Job available"
 
-[node name="Line" type="HSeparator" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=1999250750]
+[node name="Line" type="HSeparator" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=1999250750]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Client" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=1411194916]
+[node name="Client" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=1411194916]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.97, 0.99, 0.93, 1)
 theme_override_font_sizes/font_size = 20
 text_overrun_behavior = 3
 
-[node name="Address" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=660563003]
+[node name="Address" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=660563003]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.77, 0.88, 0.81, 1)
@@ -230,30 +262,71 @@ theme_override_font_sizes/font_size = 17
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Details" type="VBoxContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=32579686]
+[node name="Details" type="VBoxContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=32579686]
 layout_mode = 2
-size_flags_vertical = 10
+size_flags_vertical = 3
 mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="Lawn" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/Details" unique_id=1071880877]
+[node name="Lawn" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails/Details" unique_id=1071880877]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 
-[node name="Snow" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/Details" unique_id=1548635980]
+[node name="Snow" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails/Details" unique_id=1548635980]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.92, 0.85, 1)
 theme_override_font_sizes/font_size = 15
 
-[node name="Payout" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content" unique_id=2113328605]
+[node name="Payout" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails" unique_id=2113328605]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.68, 0.94, 0.72, 1)
-theme_override_font_sizes/font_size = 34
+theme_override_font_sizes/font_size = 26
+
+[node name="Accept" type="Button" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/JobDetails"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Accept job"
+
+[node name="HistoryScroll" type="ScrollContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="HistoryText" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/HistoryScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+text = "No completed jobs yet."
+
+[node name="SaveActions" type="HBoxContainer" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content"]
+layout_mode = 2
+
+[node name="Save" type="Button" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/SaveActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save game"
+
+[node name="Load" type="Button" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content/SaveActions"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Load save"
+
+[node name="SaveStatus" type="Label" parent="Overlay/PhoneAnchor/Phone/Shell/Screen/Content"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
 
 [node name="HomeBar" type="ColorRect" parent="Overlay/PhoneAnchor/Phone/Shell" unique_id=1785820877]
 custom_minimum_size = Vector2(62, 4)
@@ -262,6 +335,15 @@ size_flags_horizontal = 4
 mouse_filter = 2
 color = Color(0.55, 0.69, 0.61, 1)
 
+[node name="Notice" type="Label" parent="Overlay"]
+unique_name_in_owner = true
+visible = false
+offset_left = 20.0
+offset_top = 160.0
+theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.14, 1)
+theme_override_constants/outline_size = 8
+theme_override_font_sizes/font_size = 18
+
 [node name="NoticeTimer" type="Timer" parent="." unique_id=31773120]
-wait_time = 8.0
+wait_time = 5.0
 one_shot = true
