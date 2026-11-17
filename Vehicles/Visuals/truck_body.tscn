@@ -1,0 +1,172 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.24, 0.43, 0.47, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.08, 0.13, 0.15, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Glass"]
+albedo_color = Color(0.13, 0.24, 0.29, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Steel"]
+albedo_color = Color(0.51, 0.59, 0.61, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="White"]
+albedo_color = Color(0.96, 0.89, 0.68, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Red"]
+albedo_color = Color(0.72, 0.12, 0.09, 1)
+roughness = 0.76
+
+[sub_resource type="BoxMesh" id="ChassisMesh"]
+material = SubResource("Paint")
+size = Vector3(1.94, 0.47, 4.10)
+
+[sub_resource type="BoxMesh" id="HoodMesh"]
+material = SubResource("Paint")
+size = Vector3(1.84, 0.27, 1.13)
+
+[sub_resource type="BoxMesh" id="CabMesh"]
+material = SubResource("Paint")
+size = Vector3(1.79, 0.48, 1.0)
+
+[sub_resource type="BoxMesh" id="CabGlassMesh"]
+material = SubResource("Glass")
+size = Vector3(1.62, 0.51, 0.93)
+
+[sub_resource type="BoxMesh" id="RoofMesh"]
+material = SubResource("Paint")
+size = Vector3(1.76, 0.13, 1.06)
+
+[sub_resource type="BoxMesh" id="WindshieldPostLeftMesh"]
+material = SubResource("Paint")
+size = Vector3(0.08, 0.47, 0.08)
+
+[sub_resource type="BoxMesh" id="WindshieldPostRightMesh"]
+material = SubResource("Paint")
+size = Vector3(0.08, 0.47, 0.08)
+
+[sub_resource type="BoxMesh" id="BedFloorMesh"]
+material = SubResource("Dark")
+size = Vector3(1.65, 0.13, 1.79)
+
+[sub_resource type="BoxMesh" id="BedLeftMesh"]
+material = SubResource("Paint")
+size = Vector3(0.16, 0.34, 1.78)
+
+[sub_resource type="BoxMesh" id="BedRightMesh"]
+material = SubResource("Paint")
+size = Vector3(0.16, 0.34, 1.78)
+
+[sub_resource type="BoxMesh" id="TailgateMesh"]
+material = SubResource("Paint")
+size = Vector3(1.92, 0.34, 0.16)
+
+[sub_resource type="BoxMesh" id="FrontGrilleMesh"]
+material = SubResource("Dark")
+size = Vector3(1.05, 0.27, 0.08)
+
+[sub_resource type="BoxMesh" id="FrontBumperMesh"]
+material = SubResource("Steel")
+size = Vector3(2.02, 0.17, 0.17)
+
+[sub_resource type="BoxMesh" id="RearBumperMesh"]
+material = SubResource("Steel")
+size = Vector3(2.02, 0.16, 0.18)
+
+[sub_resource type="BoxMesh" id="HeadlightLeftMesh"]
+material = SubResource("White")
+size = Vector3(0.29, 0.19, 0.09)
+
+[sub_resource type="BoxMesh" id="HeadlightRightMesh"]
+material = SubResource("White")
+size = Vector3(0.29, 0.19, 0.09)
+
+[sub_resource type="BoxMesh" id="TailLightLeftMesh"]
+material = SubResource("Red")
+size = Vector3(0.19, 0.21, 0.07)
+
+[sub_resource type="BoxMesh" id="TailLightRightMesh"]
+material = SubResource("Red")
+size = Vector3(0.19, 0.21, 0.07)
+
+
+[node name="TruckBody" type="Node3D"]
+
+[node name="Chassis" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.17, 0)
+mesh = SubResource("ChassisMesh")
+
+[node name="Hood" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.51, -1.43)
+mesh = SubResource("HoodMesh")
+
+[node name="Cab" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.67, -0.48)
+mesh = SubResource("CabMesh")
+
+[node name="CabGlass" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.02, -0.48)
+mesh = SubResource("CabGlassMesh")
+
+[node name="Roof" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.29, -0.48)
+mesh = SubResource("RoofMesh")
+
+[node name="WindshieldPostLeft" type="MeshInstance3D" parent="."]
+position = Vector3(-0.79, 1.03, -0.94)
+mesh = SubResource("WindshieldPostLeftMesh")
+
+[node name="WindshieldPostRight" type="MeshInstance3D" parent="."]
+position = Vector3(0.79, 1.03, -0.94)
+mesh = SubResource("WindshieldPostRightMesh")
+
+[node name="BedFloor" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.43, 1.02)
+mesh = SubResource("BedFloorMesh")
+
+[node name="BedLeft" type="MeshInstance3D" parent="."]
+position = Vector3(-0.89, 0.59, 1.02)
+mesh = SubResource("BedLeftMesh")
+
+[node name="BedRight" type="MeshInstance3D" parent="."]
+position = Vector3(0.89, 0.59, 1.02)
+mesh = SubResource("BedRightMesh")
+
+[node name="Tailgate" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.59, 1.97)
+mesh = SubResource("TailgateMesh")
+
+[node name="FrontGrille" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.42, -2.071)
+mesh = SubResource("FrontGrilleMesh")
+
+[node name="FrontBumper" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.13, -2.09)
+mesh = SubResource("FrontBumperMesh")
+
+[node name="RearBumper" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.14, 2.08)
+mesh = SubResource("RearBumperMesh")
+
+[node name="HeadlightLeft" type="MeshInstance3D" parent="."]
+position = Vector3(-0.73, 0.44, -2.07)
+mesh = SubResource("HeadlightLeftMesh")
+
+[node name="HeadlightRight" type="MeshInstance3D" parent="."]
+position = Vector3(0.73, 0.44, -2.07)
+mesh = SubResource("HeadlightRightMesh")
+
+[node name="TailLightLeft" type="MeshInstance3D" parent="."]
+position = Vector3(-0.80, 0.54, 2.055)
+mesh = SubResource("TailLightLeftMesh")
+
+[node name="TailLightRight" type="MeshInstance3D" parent="."]
+position = Vector3(0.80, 0.54, 2.055)
+mesh = SubResource("TailLightRightMesh")

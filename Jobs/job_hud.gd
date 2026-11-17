@@ -14,6 +14,8 @@ const PHONE_HIDDEN := 460.0
 var phone_open := false
 var _phone_tween: Tween
 var _prior_mouse_mode := Input.MOUSE_MODE_CAPTURED
+var _day := 1
+var _clock := "08:00"
 
 
 func _ready() -> void:
@@ -42,12 +44,20 @@ func set_balance(amount: int) -> void:
 	%Balance.text = "Balance  £%d" % amount
 
 
-func set_day(day: int, finished: bool, last_day: int) -> void:
-	%Date.text = "December %d  ·  %s" % [day, "Night" if finished else "Day"]
+func set_day(day: int, completed: int, total: int, last_day: int) -> void:
+	_day = day
+	set_clock(_clock)
+	%DailyCount.text = "Jobs  %d / %d" % [completed, total]
+	var finished := completed >= total
 	%DayStatus.text = "Go home and sleep to get tomorrow’s jobs."
 	if finished and day == last_day:
 		%DayStatus.text = "Christmas jobs complete!"
 	%DayStatus.visible = finished
+
+
+func set_clock(clock: String) -> void:
+	_clock = clock
+	%Date.text = "December %d  ·  %s" % [_day, _clock]
 
 
 func set_history(entries: Array[Dictionary]) -> void:

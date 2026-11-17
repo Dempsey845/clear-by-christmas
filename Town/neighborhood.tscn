@@ -1,0 +1,925 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Town/road_tile.tscn" id="Road"]
+[ext_resource type="PackedScene" path="res://Town/residential_lot.tscn" id="Lot"]
+[ext_resource type="PackedScene" path="res://Town/street_lamp.tscn" id="Lamp"]
+
+[sub_resource type="StandardMaterial3D" id="SignPaint"]
+albedo_color = Color(0.09, 0.23, 0.23, 1)
+
+[sub_resource type="BoxMesh" id="StreetSign"]
+material = SubResource("SignPaint")
+size = Vector3(3.2, 0.36, 0.095)
+
+[node name="Neighborhood" type="Node3D"]
+
+[node name="Roads" type="Node3D" parent="."]
+
+[node name="PineStreet0" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -28)
+junction = true
+
+[node name="PineStreet1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-12, 0, -28)
+
+[node name="PineStreet2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-4, 0, -28)
+
+[node name="PineStreet3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(4, 0, -28)
+
+[node name="PineStreet4" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(12, 0, -28)
+
+[node name="PineStreet5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(20, 0, -28)
+
+[node name="PineStreet6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(28, 0, -28)
+
+[node name="PineStreet7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(36, 0, -28)
+
+[node name="PineStreet8" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(44, 0, -28)
+
+[node name="PineStreet9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(52, 0, -28)
+
+[node name="PineStreet10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -28)
+junction = true
+
+[node name="BirchWay0" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -60)
+junction = true
+
+[node name="BirchWay1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-12, 0, -60)
+
+[node name="BirchWay2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-4, 0, -60)
+
+[node name="BirchWay3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(4, 0, -60)
+
+[node name="BirchWay4" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(12, 0, -60)
+
+[node name="BirchWay5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(20, 0, -60)
+
+[node name="BirchWay6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(28, 0, -60)
+
+[node name="BirchWay7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(36, 0, -60)
+
+[node name="BirchWay8" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(44, 0, -60)
+
+[node name="BirchWay9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(52, 0, -60)
+
+[node name="BirchWay10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -60)
+junction = true
+
+[node name="CedarAvenue0" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -92)
+junction = true
+
+[node name="CedarAvenue1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-12, 0, -92)
+
+[node name="CedarAvenue2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-4, 0, -92)
+
+[node name="CedarAvenue3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(4, 0, -92)
+
+[node name="CedarAvenue4" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(12, 0, -92)
+
+[node name="CedarAvenue5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(20, 0, -92)
+
+[node name="CedarAvenue6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(28, 0, -92)
+
+[node name="CedarAvenue7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(36, 0, -92)
+
+[node name="CedarAvenue8" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(44, 0, -92)
+
+[node name="CedarAvenue9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(52, 0, -92)
+
+[node name="CedarAvenue10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -92)
+junction = true
+
+[node name="FirRoad0" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -124)
+junction = true
+
+[node name="FirRoad1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-12, 0, -124)
+
+[node name="FirRoad2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-4, 0, -124)
+
+[node name="FirRoad3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(4, 0, -124)
+
+[node name="FirRoad4" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(12, 0, -124)
+
+[node name="FirRoad5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(20, 0, -124)
+
+[node name="FirRoad6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(28, 0, -124)
+
+[node name="FirRoad7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(36, 0, -124)
+
+[node name="FirRoad8" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(44, 0, -124)
+
+[node name="FirRoad9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(52, 0, -124)
+
+[node name="FirRoad10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -124)
+junction = true
+
+[node name="MainStreet0" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, 20)
+junction = true
+
+[node name="MainStreet1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-12, 0, 20)
+
+[node name="MainStreet2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-4, 0, 20)
+
+[node name="MainStreet3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(4, 0, 20)
+
+[node name="MainStreet4" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(12, 0, 20)
+
+[node name="MainStreet5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(20, 0, 20)
+
+[node name="MainStreet6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(28, 0, 20)
+
+[node name="MainStreet7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(36, 0, 20)
+
+[node name="MainStreet8" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(44, 0, 20)
+
+[node name="MainStreet9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(52, 0, 20)
+
+[node name="MainStreet10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, 20)
+junction = true
+
+[node name="WestLink1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -116)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink1" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -116)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -108)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink2" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -108)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -100)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink3" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -100)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -84)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink5" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -84)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -76)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink6" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -76)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -68)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink7" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -68)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -52)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink9" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -52)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -44)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink10" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -44)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink11" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -36)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink11" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -36)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink13" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -20)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink13" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -20)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink14" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink14" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink15" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, -4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink15" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, -4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink16" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, 4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink16" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, 4)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="WestLink17" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(-20, 0, 12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="EastLink17" parent="Roads" instance=ExtResource("Road")]
+position = Vector3(60, 0, 12)
+rotation_degrees = Vector3(0, 90, 0)
+
+[node name="PineStreet" type="Node3D" parent="."]
+
+[node name="House2" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -38)
+site_id = &"1_pinestreet_02"
+address = "2 Pine Street"
+resident = "Freya Webb"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House1" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_01"
+address = "1 Pine Street"
+resident = "Ellis Ward"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House4" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -38)
+site_id = &"1_pinestreet_04"
+address = "4 Pine Street"
+resident = "Max Stone"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House3" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_03"
+address = "3 Pine Street"
+resident = "Zara Bell"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House6" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -38)
+site_id = &"1_pinestreet_06"
+address = "6 Pine Street"
+resident = "Oscar Kent"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House5" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_05"
+address = "5 Pine Street"
+resident = "Eden Cross"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House8" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -38)
+site_id = &"1_pinestreet_08"
+address = "8 Pine Street"
+resident = "Owen Reid"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House7" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_07"
+address = "7 Pine Street"
+resident = "Maya Boyd"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House10" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -38)
+site_id = &"1_pinestreet_10"
+address = "10 Pine Street"
+resident = "Theo Knox"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House9" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_09"
+address = "9 Pine Street"
+resident = "Ava Moss"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House12" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -38)
+site_id = &"1_pinestreet_12"
+address = "12 Pine Street"
+resident = "Toby Hayes"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House11" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_11"
+address = "11 Pine Street"
+resident = "Rosa King"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House14" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -38)
+site_id = &"1_pinestreet_14"
+address = "14 Pine Street"
+resident = "Callum Hart"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House13" parent="PineStreet" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -18)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"1_pinestreet_13"
+address = "13 Pine Street"
+resident = "Ben Wood"
+pay = 20
+lawn_depth = 0.13
+
+[node name="WestLamp" parent="PineStreet" instance=ExtResource("Lamp")]
+position = Vector3(-14, 0, -33)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="WestSign" type="MeshInstance3D" parent="PineStreet/WestLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="WestName" type="Label3D" parent="PineStreet/WestLamp/WestSign"]
+position = Vector3(0, 0, 0.052)
+text = "PINE STREET"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="EastLamp" parent="PineStreet" instance=ExtResource("Lamp")]
+position = Vector3(54, 0, -23)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="EastSign" type="MeshInstance3D" parent="PineStreet/EastLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="EastName" type="Label3D" parent="PineStreet/EastLamp/EastSign"]
+position = Vector3(0, 0, 0.052)
+text = "PINE STREET"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="BirchWay" type="Node3D" parent="."]
+
+[node name="House2" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -70)
+site_id = &"2_birchway_02"
+address = "2 Birch Way"
+resident = "Lucas West"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House1" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_01"
+address = "1 Birch Way"
+resident = "Poppy Mills"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House4" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -70)
+site_id = &"2_birchway_04"
+address = "4 Birch Way"
+resident = "Ivy Shaw"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House3" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_03"
+address = "3 Birch Way"
+resident = "Erin Lake"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House6" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -70)
+site_id = &"2_birchway_06"
+address = "6 Birch Way"
+resident = "Rory Hale"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House5" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_05"
+address = "5 Birch Way"
+resident = "Leah Hunt"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House8" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -70)
+site_id = &"2_birchway_08"
+address = "8 Birch Way"
+resident = "Milo Dean"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House7" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_07"
+address = "7 Birch Way"
+resident = "Sana Ford"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House10" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -70)
+site_id = &"2_birchway_10"
+address = "10 Birch Way"
+resident = "Arthur Finch"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House9" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_09"
+address = "9 Birch Way"
+resident = "Amira Cole"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House12" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -70)
+site_id = &"2_birchway_12"
+address = "12 Birch Way"
+resident = "Felix Grant"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House11" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_11"
+address = "11 Birch Way"
+resident = "Nina Clarke"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House14" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -70)
+site_id = &"2_birchway_14"
+address = "14 Birch Way"
+resident = "Noah Wells"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House13" parent="BirchWay" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -50)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"2_birchway_13"
+address = "13 Birch Way"
+resident = "Isla Dunn"
+pay = 14
+lawn_depth = 0.10
+
+[node name="WestLamp" parent="BirchWay" instance=ExtResource("Lamp")]
+position = Vector3(-14, 0, -65)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="WestSign" type="MeshInstance3D" parent="BirchWay/WestLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="WestName" type="Label3D" parent="BirchWay/WestLamp/WestSign"]
+position = Vector3(0, 0, 0.052)
+text = "BIRCH WAY"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="EastLamp" parent="BirchWay" instance=ExtResource("Lamp")]
+position = Vector3(54, 0, -55)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="EastSign" type="MeshInstance3D" parent="BirchWay/EastLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="EastName" type="Label3D" parent="BirchWay/EastLamp/EastSign"]
+position = Vector3(0, 0, 0.052)
+text = "BIRCH WAY"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="CedarAvenue" type="Node3D" parent="."]
+
+[node name="House2" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -102)
+site_id = &"3_cedaravenue_02"
+address = "2 Cedar Avenue"
+resident = "Leah Hunt"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House1" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_01"
+address = "1 Cedar Avenue"
+resident = "Ivy Shaw"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House4" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -102)
+site_id = &"3_cedaravenue_04"
+address = "4 Cedar Avenue"
+resident = "Sana Ford"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House3" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_03"
+address = "3 Cedar Avenue"
+resident = "Rory Hale"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House6" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -102)
+site_id = &"3_cedaravenue_06"
+address = "6 Cedar Avenue"
+resident = "Amira Cole"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House5" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_05"
+address = "5 Cedar Avenue"
+resident = "Milo Dean"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House8" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -102)
+site_id = &"3_cedaravenue_08"
+address = "8 Cedar Avenue"
+resident = "Nina Clarke"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House7" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_07"
+address = "7 Cedar Avenue"
+resident = "Arthur Finch"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House10" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -102)
+site_id = &"3_cedaravenue_10"
+address = "10 Cedar Avenue"
+resident = "Isla Dunn"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House9" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_09"
+address = "9 Cedar Avenue"
+resident = "Felix Grant"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House12" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -102)
+site_id = &"3_cedaravenue_12"
+address = "12 Cedar Avenue"
+resident = "Ellis Ward"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House11" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_11"
+address = "11 Cedar Avenue"
+resident = "Noah Wells"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House14" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -102)
+site_id = &"3_cedaravenue_14"
+address = "14 Cedar Avenue"
+resident = "Zara Bell"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House13" parent="CedarAvenue" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -82)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"3_cedaravenue_13"
+address = "13 Cedar Avenue"
+resident = "Freya Webb"
+pay = 18
+lawn_depth = 0.12
+
+[node name="WestLamp" parent="CedarAvenue" instance=ExtResource("Lamp")]
+position = Vector3(-14, 0, -97)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="WestSign" type="MeshInstance3D" parent="CedarAvenue/WestLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="WestName" type="Label3D" parent="CedarAvenue/WestLamp/WestSign"]
+position = Vector3(0, 0, 0.052)
+text = "CEDAR AVENUE"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="EastLamp" parent="CedarAvenue" instance=ExtResource("Lamp")]
+position = Vector3(54, 0, -87)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="EastSign" type="MeshInstance3D" parent="CedarAvenue/EastLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="EastName" type="Label3D" parent="CedarAvenue/EastLamp/EastSign"]
+position = Vector3(0, 0, 0.052)
+text = "CEDAR AVENUE"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="FirRoad" type="Node3D" parent="."]
+
+[node name="House2" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -134)
+site_id = &"4_firroad_02"
+address = "2 Fir Road"
+resident = "Eden Cross"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House1" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(-6, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_01"
+address = "1 Fir Road"
+resident = "Max Stone"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House4" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -134)
+site_id = &"4_firroad_04"
+address = "4 Fir Road"
+resident = "Maya Boyd"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House3" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(2, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_03"
+address = "3 Fir Road"
+resident = "Oscar Kent"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House6" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -134)
+site_id = &"4_firroad_06"
+address = "6 Fir Road"
+resident = "Ava Moss"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House5" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(10, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_05"
+address = "5 Fir Road"
+resident = "Owen Reid"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House8" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -134)
+site_id = &"4_firroad_08"
+address = "8 Fir Road"
+resident = "Rosa King"
+pay = 12
+lawn_depth = 0.09
+
+[node name="House7" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(18, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_07"
+address = "7 Fir Road"
+resident = "Theo Knox"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House10" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -134)
+site_id = &"4_firroad_10"
+address = "10 Fir Road"
+resident = "Ben Wood"
+pay = 18
+lawn_depth = 0.12
+
+[node name="House9" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(26, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_09"
+address = "9 Fir Road"
+resident = "Toby Hayes"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House12" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -134)
+site_id = &"4_firroad_12"
+address = "12 Fir Road"
+resident = "Poppy Mills"
+pay = 14
+lawn_depth = 0.10
+
+[node name="House11" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(34, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_11"
+address = "11 Fir Road"
+resident = "Callum Hart"
+pay = 16
+lawn_depth = 0.11
+
+[node name="House14" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -134)
+site_id = &"4_firroad_14"
+address = "14 Fir Road"
+resident = "Erin Lake"
+pay = 20
+lawn_depth = 0.13
+
+[node name="House13" parent="FirRoad" instance=ExtResource("Lot")]
+position = Vector3(42, 0, -114)
+rotation_degrees = Vector3(0, 180, 0)
+site_id = &"4_firroad_13"
+address = "13 Fir Road"
+resident = "Lucas West"
+pay = 12
+lawn_depth = 0.09
+
+[node name="WestLamp" parent="FirRoad" instance=ExtResource("Lamp")]
+position = Vector3(-14, 0, -129)
+rotation_degrees = Vector3(0, 0, 0)
+
+[node name="WestSign" type="MeshInstance3D" parent="FirRoad/WestLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="WestName" type="Label3D" parent="FirRoad/WestLamp/WestSign"]
+position = Vector3(0, 0, 0.052)
+text = "FIR ROAD"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="EastLamp" parent="FirRoad" instance=ExtResource("Lamp")]
+position = Vector3(54, 0, -119)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="EastSign" type="MeshInstance3D" parent="FirRoad/EastLamp"]
+position = Vector3(0, 2.05, 0)
+mesh = SubResource("StreetSign")
+
+[node name="EastName" type="Label3D" parent="FirRoad/EastLamp/EastSign"]
+position = Vector3(0, 0, 0.052)
+text = "FIR ROAD"
+font_size = 38
+pixel_size = 0.006
+outline_size = 0
+modulate = Color(0.95, 0.95, 0.84, 1)
+
+[node name="WestServiceLamp" parent="." instance=ExtResource("Lamp")]
+position = Vector3(-13, 0, 25)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="MarketLamp" parent="." instance=ExtResource("Lamp")]
+position = Vector3(17, 0, 27)
+
+[node name="HomeLamp" parent="." instance=ExtResource("Lamp")]
+position = Vector3(1, 0, 10.25)

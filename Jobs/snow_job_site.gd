@@ -4,6 +4,8 @@ extends Node3D
 @export var site_id: StringName
 @export var lawn_chunks: Array[SnowChunk]
 
+var request: SnowJob
+
 var _chunks: Array[SnowChunk] = []
 var _fields: Array[SnowField] = []
 
@@ -41,7 +43,8 @@ func snow_volume_m3() -> float:
 func fresh_snow_volume_m3(multiplier: float) -> float:
 	var volume := 0.0
 	for chunk in _chunks:
-		volume += chunk.base_snow_volume_m3 * multiplier
+		var field := chunk.get_parent() as SnowField
+		volume += chunk.base_snow_volume_m3 * field.snowfall_multiplier(multiplier)
 	return volume
 
 

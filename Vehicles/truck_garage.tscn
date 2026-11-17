@@ -1,0 +1,178 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Vehicles/truck_garage.gd" id="Script"]
+
+[sub_resource type="StandardMaterial3D" id="Floor"]
+albedo_color = Color(0.29, 0.33, 0.34, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Wall"]
+albedo_color = Color(0.43, 0.48, 0.48, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Roof"]
+albedo_color = Color(0.20, 0.26, 0.28, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Trim"]
+albedo_color = Color(0.12, 0.24, 0.27, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Stripe"]
+albedo_color = Color(0.97, 0.66, 0.19, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Light"]
+albedo_color = Color(0.97, 0.94, 0.80, 1)
+roughness = 0.88
+emission_enabled = true
+emission = Color(0.88, 0.85, 0.74, 1)
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+content_margin_left = 24.0
+content_margin_top = 19.0
+content_margin_right = 24.0
+content_margin_bottom = 19.0
+bg_color = Color(0.075, 0.12, 0.15, 0.97)
+border_width_top = 3
+border_color = Color(0.95, 0.65, 0.25, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_left = 9
+corner_radius_bottom_right = 9
+
+[node name="TruckGarage" type="Node3D"]
+script = ExtResource("Script")
+
+[node name="Floor" type="CSGBox3D" parent="."]
+position = Vector3(0, -0.063, 0)
+size = Vector3(6.3, 0.15, 7.4)
+material = SubResource("Floor")
+
+[node name="LeftWall" type="CSGBox3D" parent="."]
+position = Vector3(-3.04, 1.51, 0)
+size = Vector3(0.22, 3.02, 7.4)
+material = SubResource("Wall")
+use_collision = true
+
+[node name="RightWall" type="CSGBox3D" parent="."]
+position = Vector3(3.04, 1.51, 0)
+size = Vector3(0.22, 3.02, 7.4)
+material = SubResource("Wall")
+use_collision = true
+
+[node name="BackWall" type="CSGBox3D" parent="."]
+position = Vector3(0, 1.51, -3.61)
+size = Vector3(5.9, 3.02, 0.18)
+material = SubResource("Wall")
+use_collision = true
+
+[node name="Roof" type="CSGBox3D" parent="."]
+position = Vector3(0, 3.12, 0)
+size = Vector3(6.55, 0.24, 7.75)
+material = SubResource("Roof")
+use_collision = true
+
+[node name="Header" type="CSGBox3D" parent="."]
+position = Vector3(0, 2.87, 3.69)
+size = Vector3(6.36, 0.65, 0.20)
+material = SubResource("Trim")
+use_collision = true
+
+[node name="LeftPost" type="CSGBox3D" parent="."]
+position = Vector3(-2.99, 1.44, 3.71)
+size = Vector3(0.35, 2.88, 0.24)
+material = SubResource("Trim")
+use_collision = true
+
+[node name="RightPost" type="CSGBox3D" parent="."]
+position = Vector3(2.99, 1.44, 3.71)
+size = Vector3(0.35, 2.88, 0.24)
+material = SubResource("Trim")
+use_collision = true
+
+[node name="LeftBayLine" type="CSGBox3D" parent="."]
+position = Vector3(-1.50, 0.017, 0)
+size = Vector3(0.09, 0.018, 5.7)
+material = SubResource("Stripe")
+
+[node name="RightBayLine" type="CSGBox3D" parent="."]
+position = Vector3(1.50, 0.017, 0)
+size = Vector3(0.09, 0.018, 5.7)
+material = SubResource("Stripe")
+
+[node name="BayStopLine" type="CSGBox3D" parent="."]
+position = Vector3(0, 0.017, -2.8)
+size = Vector3(3.08, 0.018, 0.12)
+material = SubResource("Stripe")
+
+[node name="Apron" type="CSGBox3D" parent="."]
+position = Vector3(0, 0.006, 6.15)
+size = Vector3(6.12, 0.012, 4.85)
+material = SubResource("Floor")
+
+[node name="CeilingLight" type="CSGBox3D" parent="."]
+position = Vector3(0, 2.96, 0)
+size = Vector3(2.2, 0.09, 0.24)
+material = SubResource("Light")
+
+[node name="ShopSign" type="Label3D" parent="."]
+position = Vector3(0, 2.88, 3.81)
+pixel_size = 0.008
+modulate = Color(0.99, 0.89, 0.67, 1)
+text = "GARAGE"
+font_size = 48
+outline_size = 5
+
+[node name="BayLight" type="OmniLight3D" parent="."]
+position = Vector3(0, 2.82, 0.1)
+light_color = Color(0.96, 0.94, 0.84, 1)
+light_energy = 0.82
+omni_range = 7.0
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="Panel" type="PanelContainer" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -218.0
+offset_top = -153.0
+offset_right = 218.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="Content" type="VBoxContainer" parent="HUD/Panel"]
+theme_override_constants/separation = 9
+
+[node name="Heading" type="Label" parent="HUD/Panel/Content"]
+theme_override_font_sizes/font_size = 24
+text = "Truck garage"
+
+[node name="Balance" type="Label" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+
+[node name="Stock" type="Button" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+text = "Standard truck"
+
+[node name="Scoop" type="Button" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+
+[node name="Vacuum" type="Button" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+
+[node name="Feedback" type="Label" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(385, 42)
+autowrap_mode = 2
+
+[node name="Close" type="Button" parent="HUD/Panel/Content"]
+unique_name_in_owner = true
+text = "Back to truck"

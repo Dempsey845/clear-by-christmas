@@ -103,6 +103,13 @@ horizontal_alignment = 2
 theme_override_font_sizes/font_size = 16
 text = "December 1"
 
+[node name="DailyCount" type="Label" parent="Overlay/Wallet/Lines"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 15
+text = "Jobs  0 / 4"
+
 [node name="DayStatus" type="Label" parent="Overlay/Wallet/Lines"]
 unique_name_in_owner = true
 visible = false

@@ -1,0 +1,91 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Vehicles/snow_truck.gd" id="Script"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_body.tscn" id="Body"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_wheel.tscn" id="Wheel"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_scoop.tscn" id="Scoop"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_vacuum_nozzle.tscn" id="Nozzle"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_vacuum_tank.tscn" id="Tank"]
+
+[sub_resource type="BoxShape3D" id="Chassis"]
+size = Vector3(1.92, 0.42, 4.15)
+
+[sub_resource type="BoxShape3D" id="Cab"]
+size = Vector3(1.75, 0.84, 1.04)
+
+[node name="SnowTruck" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 7
+mass = 1050.0
+center_of_mass_mode = 1
+center_of_mass = Vector3(0, -0.19, 0)
+linear_damp = 0.12
+angular_damp = 0.72
+continuous_cd = true
+script = ExtResource("Script")
+body_visual = ExtResource("Body")
+wheel_visual = ExtResource("Wheel")
+scoop_visual = ExtResource("Scoop")
+vacuum_nozzle_visual = ExtResource("Nozzle")
+vacuum_tank_visual = ExtResource("Tank")
+
+[node name="Chassis" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.19, 0)
+shape = SubResource("Chassis")
+
+[node name="Cab" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.81, -0.49)
+shape = SubResource("Cab")
+
+[node name="BodyMount" type="Marker3D" parent="."]
+
+[node name="FrontMount" type="Marker3D" parent="."]
+position = Vector3(0, 0.04, -2.13)
+
+[node name="ScoopHinge" type="Node3D" parent="FrontMount"]
+
+[node name="BedMount" type="Marker3D" parent="."]
+position = Vector3(0, 0.48, 1.03)
+
+[node name="Intake" type="Marker3D" parent="."]
+position = Vector3(0, -0.31, -2.87)
+
+[node name="RearOutlet" type="Marker3D" parent="."]
+position = Vector3(0, -0.18, 2.91)
+
+[node name="ChaseCamera" type="Camera3D" parent="."]
+fov = 70.0
+
+[node name="Suspension" type="Node3D" parent="."]
+
+[node name="FrontLeft" type="Marker3D" parent="Suspension"]
+position = Vector3(-0.91, 0.29, -1.39)
+
+[node name="Steer" type="Node3D" parent="Suspension/FrontLeft"]
+position = Vector3(0, -0.56, 0)
+
+[node name="Roll" type="Node3D" parent="Suspension/FrontLeft/Steer"]
+
+[node name="FrontRight" type="Marker3D" parent="Suspension"]
+position = Vector3(0.91, 0.29, -1.39)
+
+[node name="Steer" type="Node3D" parent="Suspension/FrontRight"]
+position = Vector3(0, -0.56, 0)
+
+[node name="Roll" type="Node3D" parent="Suspension/FrontRight/Steer"]
+
+[node name="RearLeft" type="Marker3D" parent="Suspension"]
+position = Vector3(-0.91, 0.29, 1.38)
+
+[node name="Steer" type="Node3D" parent="Suspension/RearLeft"]
+position = Vector3(0, -0.56, 0)
+
+[node name="Roll" type="Node3D" parent="Suspension/RearLeft/Steer"]
+
+[node name="RearRight" type="Marker3D" parent="Suspension"]
+position = Vector3(0.91, 0.29, 1.38)
+
+[node name="Steer" type="Node3D" parent="Suspension/RearRight"]
+position = Vector3(0, -0.56, 0)
+
+[node name="Roll" type="Node3D" parent="Suspension/RearRight/Steer"]

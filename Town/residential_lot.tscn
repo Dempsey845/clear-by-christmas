@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Town/residential_lot.gd" id="Script"]
+[ext_resource type="PackedScene" path="res://Jobs/sample_house.tscn" id="House"]
+[ext_resource type="PackedScene" path="res://Jobs/snow_job_site.tscn" id="Site"]
+
+[node name="ResidentialLot" type="Node3D" groups=["residential_lots"]]
+script = ExtResource("Script")
+
+[node name="House" parent="." instance=ExtResource("House")]
+
+[node name="Site" parent="." instance=ExtResource("Site")]
+position = Vector3(0, 0, 4)
+
+[node name="Address" type="Label3D" parent="."]
+position = Vector3(0, 2.55, 1.31)
+font_size = 30
+pixel_size = 0.0055
+modulate = Color(1, 0.92, 0.72, 1)
+outline_size = 8

@@ -18,11 +18,14 @@ var day := 1
 var player_indoors := false
 var day_finished: bool:
 	get:
-		return _request_index >= requests.size()
+		return _request_index >= _daily_requests.size()
 
 var _request_index := 0
 var _history: Array[Dictionary] = []
 var _sites: Dictionary[StringName, SnowJobSite] = {}
+var _catalog: Dictionary[StringName, SnowJob] = {}
+var _job_order: Array[SnowJob] = []
+var _daily_requests: Array[SnowJob] = []
 var _job: SnowJob
 var _site: SnowJobSite
 var _starting_volume := 0.0
@@ -42,6 +45,18 @@ func prepare() -> void:
 			push_warning("Duplicate snow job site: %s" % site.site_id)
 			continue
 		_sites[site.site_id] = site
+	for request in requests:
+		if _sites.has(request.site_id):
+			_catalog[request.site_id] = request
+			_job_order.append(request)
+	var site_ids := _sites.keys()
+	site_ids.sort()
+	for id in site_ids:
+		var site := _sites[id]
+		if site.request != null and not _catalog.has(id):
+			_catalog[id] = site.request
+			_job_order.append(site.request)
+	_daily_requests = _make_schedule(day, [])
 	_show_request()
 
 
@@ -59,7 +74,7 @@ func try_spend(amount: int) -> bool:
 func accept_job() -> void:
 	if _job != null or day_finished:
 		return
-	var request := requests[_request_index]
+	var request := _daily_requests[_request_index]
 	var site := _sites.get(request.site_id) as SnowJobSite
 	if site == null:
 		return
@@ -81,6 +96,7 @@ func advance_day() -> void:
 		return
 	day += 1
 	_request_index = 0
+	_daily_requests = _make_schedule(day, _daily_requests)
 	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
 		field.reset_snow(snow_multiplier())
 	_show_request()
@@ -95,16 +111,20 @@ static func snow_multiplier_for_day(date: int) -> float:
 
 
 func save_state() -> Dictionary:
+	var daily_sites: Array[String] = []
+	for request in _daily_requests:
+		daily_sites.append(String(request.site_id))
 	return {
 		"balance": balance, "day": day, "request_index": _request_index,
-		"accepted": _job != null, "history": _history,
+		"accepted": _job != null, "history": _history, "daily_sites": daily_sites,
 	}
 
 
 func restore_state(state: Dictionary) -> void:
 	_clear_assignment()
 	day = clampi(state.get("day", 1), 1, LAST_DAY)
-	_request_index = clampi(state.get("request_index", 0), 0, requests.size())
+	_daily_requests = _restore_schedule(state)
+	_request_index = clampi(state.get("request_index", 0), 0, _daily_requests.size())
 	_history.assign(state.get("history", []))
 	_change_balance(int(state.get("balance", 0)) - balance)
 	hud.clear_notice()
@@ -113,13 +133,54 @@ func restore_state(state: Dictionary) -> void:
 		accept_job()
 
 
+func _make_schedule(date: int, previous: Array[SnowJob]) -> Array[SnowJob]:
+	var selected: Array[SnowJob] = []
+	if _job_order.is_empty():
+		return selected
+	var count := mini(3 + date, _job_order.size())
+	var offset := int((date - 1) * (date + 6) * 0.5)
+	for index in _job_order.size():
+		var candidate := _job_order[(offset + index) % _job_order.size()]
+		if candidate not in previous:
+			selected.append(candidate)
+			if selected.size() == count:
+				return selected
+	# Smaller town layouts can still fill the schedule from yesterday's sites.
+	for candidate in previous:
+		if candidate not in selected:
+			selected.append(candidate)
+		if selected.size() == count:
+			break
+	return selected
+
+
+func _restore_schedule(state: Dictionary) -> Array[SnowJob]:
+	var selected: Array[SnowJob] = []
+	var saved_sites: Variant = state.get("daily_sites")
+	if saved_sites is Array:
+		for id in saved_sites:
+			var request := _catalog.get(StringName(str(id))) as SnowJob
+			if request != null and request not in selected:
+				selected.append(request)
+		if selected.size() == saved_sites.size() and not selected.is_empty():
+			return selected
+	# Version-one saves used the four Holly Lane jobs for every day.
+	if not state.has("daily_sites"):
+		for request in requests:
+			if _catalog.has(request.site_id):
+				selected.append(request)
+		if not selected.is_empty():
+			return selected
+	return _make_schedule(day, [])
+
+
 func _show_request() -> void:
-	hud.set_day(day, day_finished, LAST_DAY)
+	hud.set_day(day, _request_index, _daily_requests.size(), LAST_DAY)
 	hud.set_history(_history)
 	if day_finished:
 		hud.show_day_finished(day == LAST_DAY)
 		return
-	var request := requests[_request_index]
+	var request := _daily_requests[_request_index]
 	var site := _sites.get(request.site_id) as SnowJobSite
 	if site != null:
 		hud.show_offer(request, site.lawn_area_m2(), site.fresh_snow_volume_m3(snow_multiplier()))

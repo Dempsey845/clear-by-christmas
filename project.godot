@@ -102,6 +102,7 @@ market_interact={
 [layer_names]
 
 3d_physics/layer_2="Snow"
+3d_physics/layer_3="Vehicles"
 
 [physics]
 

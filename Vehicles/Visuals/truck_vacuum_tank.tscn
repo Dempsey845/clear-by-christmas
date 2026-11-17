@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.27, 0.43, 0.66, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.11, 0.17, 0.23, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Amber"]
+albedo_color = Color(0.97, 0.54, 0.11, 1)
+roughness = 0.76
+
+[sub_resource type="BoxMesh" id="TankMesh"]
+material = SubResource("Paint")
+size = Vector3(1.47, 0.60, 1.52)
+
+[sub_resource type="BoxMesh" id="LidMesh"]
+material = SubResource("Dark")
+size = Vector3(1.51, 0.11, 1.55)
+
+[sub_resource type="BoxMesh" id="SpoutMesh"]
+material = SubResource("Dark")
+size = Vector3(0.65, 0.23, 0.24)
+
+[sub_resource type="BoxMesh" id="RearStripeMesh"]
+material = SubResource("Amber")
+size = Vector3(1.2, 0.13, 0.025)
+
+
+[node name="VacuumTank" type="Node3D"]
+
+[node name="Tank" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.31, 0)
+mesh = SubResource("TankMesh")
+
+[node name="Lid" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.64, 0)
+mesh = SubResource("LidMesh")
+
+[node name="Spout" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.17, 0.82)
+mesh = SubResource("SpoutMesh")
+
+[node name="RearStripe" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.39, 0.769)
+mesh = SubResource("RearStripeMesh")

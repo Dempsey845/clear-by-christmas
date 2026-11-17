@@ -1,0 +1,48 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Town/road_tile.gd" id="Script"]
+
+[sub_resource type="StandardMaterial3D" id="Asphalt"]
+albedo_color = Color(0.104, 0.114, 0.124, 1)
+roughness = 0.96
+
+[sub_resource type="StandardMaterial3D" id="EdgePaint"]
+albedo_color = Color(0.49, 0.54, 0.55, 1)
+roughness = 0.87
+
+[sub_resource type="StandardMaterial3D" id="LanePaint"]
+albedo_color = Color(0.79, 0.76, 0.61, 1)
+roughness = 0.85
+
+[sub_resource type="BoxMesh" id="Road"]
+material = SubResource("Asphalt")
+size = Vector3(8, 0.024, 8)
+
+[sub_resource type="BoxMesh" id="Edge"]
+material = SubResource("EdgePaint")
+size = Vector3(8, 0.006, 0.075)
+
+[sub_resource type="BoxMesh" id="Dash"]
+material = SubResource("LanePaint")
+size = Vector3(2.15, 0.006, 0.095)
+
+[node name="RoadTile" type="Node3D" groups=["town_roads"]]
+script = ExtResource("Script")
+
+[node name="Asphalt" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.004, 0)
+mesh = SubResource("Road")
+
+[node name="Markings" type="Node3D" parent="."]
+
+[node name="NorthEdge" type="MeshInstance3D" parent="Markings"]
+position = Vector3(0, 0.009, -3.62)
+mesh = SubResource("Edge")
+
+[node name="SouthEdge" type="MeshInstance3D" parent="Markings"]
+position = Vector3(0, 0.009, 3.62)
+mesh = SubResource("Edge")
+
+[node name="CentreDash" type="MeshInstance3D" parent="Markings"]
+position = Vector3(0, 0.009, 0)
+mesh = SubResource("Dash")

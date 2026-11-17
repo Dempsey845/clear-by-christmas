@@ -1,0 +1,36 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.27, 0.43, 0.66, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Dark"]
+albedo_color = Color(0.11, 0.17, 0.23, 1)
+roughness = 0.76
+
+[sub_resource type="BoxMesh" id="NozzleMesh"]
+material = SubResource("Paint")
+size = Vector3(2.14, 0.27, 0.47)
+
+[sub_resource type="BoxMesh" id="IntakeMesh"]
+material = SubResource("Dark")
+size = Vector3(1.94, 0.13, 0.06)
+
+[sub_resource type="BoxMesh" id="DuctMesh"]
+material = SubResource("Dark")
+size = Vector3(0.52, 0.26, 0.58)
+
+
+[node name="VacuumNozzle" type="Node3D"]
+
+[node name="Nozzle" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.05, -0.32)
+mesh = SubResource("NozzleMesh")
+
+[node name="Intake" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.07, -0.567)
+mesh = SubResource("IntakeMesh")
+
+[node name="Duct" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.11, 0.02)
+mesh = SubResource("DuctMesh")

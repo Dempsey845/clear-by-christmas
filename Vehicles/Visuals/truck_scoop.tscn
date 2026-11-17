@@ -1,0 +1,55 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Amber"]
+albedo_color = Color(0.97, 0.54, 0.11, 1)
+roughness = 0.76
+
+[sub_resource type="StandardMaterial3D" id="Steel"]
+albedo_color = Color(0.28, 0.32, 0.34, 1)
+roughness = 0.76
+
+[sub_resource type="BoxMesh" id="FloorMesh"]
+material = SubResource("Amber")
+size = Vector3(2.28, 0.1, 0.76)
+
+[sub_resource type="BoxMesh" id="BackMesh"]
+material = SubResource("Amber")
+size = Vector3(2.28, 0.47, 0.12)
+
+[sub_resource type="BoxMesh" id="LeftMesh"]
+material = SubResource("Amber")
+size = Vector3(0.12, 0.38, 0.70)
+
+[sub_resource type="BoxMesh" id="RightMesh"]
+material = SubResource("Amber")
+size = Vector3(0.12, 0.38, 0.70)
+
+[sub_resource type="BoxMesh" id="BladeMesh"]
+material = SubResource("Steel")
+size = Vector3(2.31, 0.075, 0.11)
+
+
+[node name="TruckScoop" type="Node3D"]
+
+[node name="Floor" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.18, -0.32)
+rotation_degrees = Vector3(-8, 0, 0)
+mesh = SubResource("FloorMesh")
+
+[node name="Back" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.04, 0.055)
+mesh = SubResource("BackMesh")
+
+[node name="Left" type="MeshInstance3D" parent="."]
+position = Vector3(-1.09, -0.012, -0.29)
+rotation_degrees = Vector3(-8, 0, 0)
+mesh = SubResource("LeftMesh")
+
+[node name="Right" type="MeshInstance3D" parent="."]
+position = Vector3(1.09, -0.012, -0.29)
+rotation_degrees = Vector3(-8, 0, 0)
+mesh = SubResource("RightMesh")
+
+[node name="Blade" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.23, -0.72)
+mesh = SubResource("BladeMesh")

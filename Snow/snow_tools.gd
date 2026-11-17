@@ -83,12 +83,12 @@ func _physics_process(delta: float) -> void:
 		_suction_elapsed = 0.0
 
 
-func set_indoors(indoors: bool) -> void:
-	set_physics_process(not indoors)
-	$HeldTool.visible = not indoors
-	status.visible = not indoors
-	crosshair.visible = not indoors and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	if indoors:
+func set_available(available: bool) -> void:
+	set_physics_process(available)
+	$HeldTool.visible = available
+	status.visible = available
+	crosshair.visible = available and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	if not available:
 		marker.hide()
 		powder.emitting = false
 		_aim_field = null

@@ -38,7 +38,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _in_range() -> bool:
-	return is_instance_valid(player) and player.global_position.distance_to(global_position) <= interaction_distance
+	return is_instance_valid(player) and player.is_visible_in_tree() \
+		and player.global_position.distance_to(global_position) <= interaction_distance
 
 
 func _show_market() -> void:

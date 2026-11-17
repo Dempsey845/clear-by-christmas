@@ -2,6 +2,7 @@ class_name SnowChunk
 extends MeshInstance3D
 
 @export_range(0.0, 1.5, 0.01) var initial_depth := 0.32
+@export_range(0.0, 1.5, 0.01) var pile_height := 0.0
 
 const MATERIAL = preload("res://Snow/snow_material.tres")
 
@@ -21,6 +22,7 @@ var _footprints := PackedFloat32Array()
 var _heightmap := HeightMapShape3D.new()
 var _collider: CollisionShape3D
 var _collision_heights := PackedFloat32Array()
+var _pile_depths := PackedFloat32Array()
 
 
 func initialize(field: SnowField, noise: FastNoiseLite) -> void:
@@ -34,6 +36,8 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 	_colors.resize(count)
 	_uvs.resize(count)
 	_footprints.resize(count)
+	if pile_height > 0.0:
+		_pile_depths.resize(count)
 	material_override = MATERIAL
 
 	for z in side:
@@ -53,15 +57,21 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 			# Shared edge samples contribute only their share of the represented volume.
 			weights[index] = field.spacing * field.spacing / float(expected)
 			depths[index] = maxf(0.0, base_depth * (1.0 + 0.45 * noise.get_noise_2dv(point)))
+			if not field.allows_snow_at(point):
+				editable[index] = 0
 			if not editable[index]:
 				depths[index] = 0.0
+			elif pile_height > 0.0:
+				var offset := Vector2(x, z) / float(side - 1) - Vector2(0.52, 0.48)
+				var radius := (offset / Vector2(0.38, 0.34)).length()
+				_pile_depths[index] = pile_height * (1.0 - smoothstep(0.0, 1.0, radius))
+				depths[index] += _pile_depths[index]
 			snow_volume_m3 += depths[index] * weights[index]
 			_vertices[index] = Vector3(x * field.spacing, 0.0, z * field.spacing)
 			_uvs[index] = point
 	initial_depths = depths.duplicate()
 	base_snow_volume_m3 = snow_volume_m3
 	if field.collision_enabled:
-		_create_collision(field)
 		rebuild_collision(field)
 
 
@@ -133,7 +143,10 @@ func reset_depths(multiplier: float) -> void:
 
 
 func save_state() -> Dictionary:
-	return {"depths": depths, "footprints": _footprints}
+	var state := {"depths": depths, "footprints": _footprints}
+	if pile_height > 0.0:
+		state["pile_seeded"] = true
+	return state
 
 
 func restore_state(state: Dictionary, multiplier: float) -> void:
@@ -146,8 +159,11 @@ func restore_state(state: Dictionary, multiplier: float) -> void:
 	_footprints.fill(0.0)
 	if saved_footprints is PackedFloat32Array and saved_footprints.size() == depths.size():
 		_footprints = saved_footprints
+	var seed_pile: bool = pile_height > 0.0 and state.get("pile_seeded", false) != true
 	snow_volume_m3 = 0.0
 	for index in depths.size():
+		if seed_pile:
+			depths[index] += _pile_depths[index] * multiplier
 		snow_volume_m3 += depths[index] * weights[index]
 
 
@@ -168,12 +184,17 @@ func _create_collision(field: SnowField) -> void:
 
 func rebuild_collision(field: SnowField) -> void:
 	var has_snow := false
+	for depth in depths:
+		if depth >= field.collision_min_depth:
+			has_snow = true
+			break
+	if not has_snow:
+		if _collider != null:
+			_collider.shape = null
+		return
+	if _collider == null:
+		_create_collision(field)
 	for index in depths.size():
-		var depth := depths[index]
-		_collision_heights[index] = depth / field.spacing
-		has_snow = has_snow or depth >= 0.006
-	if has_snow:
-		_heightmap.map_data = _collision_heights
-		_collider.shape = _heightmap
-	else:
-		_collider.shape = null
+		_collision_heights[index] = depths[index] / field.spacing
+	_heightmap.map_data = _collision_heights
+	_collider.shape = _heightmap

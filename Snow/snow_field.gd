@@ -8,8 +8,10 @@ const COLLISION_LAYER := 1 << 1
 @export var collision_enabled := true
 @export_range(1.0, 16.0, 0.25) var chunk_size := 4.0
 @export_range(8, 64, 1) var cells_per_chunk := 32
-@export_range(1, 16, 1) var mesh_updates_per_frame := 4
+@export_range(1, 96, 1) var mesh_updates_per_frame := 4
 @export var drift_seed := 28
+@export_range(0.006, 0.20, 0.001) var collision_min_depth := 0.006
+@export var scale_snowfall := true
 
 var spacing: float
 var indices := PackedInt32Array()
@@ -17,7 +19,10 @@ var indices := PackedInt32Array()
 var _chunks: Dictionary[Vector2i, SnowChunk] = {}
 var _dirty: Dictionary[Vector2i, SnowChunk] = {}
 var _collision_dirty: Dictionary[Vector2i, bool] = {}
+var _modified: Dictionary[Vector2i, bool] = {}
+var _snowfall_multiplier := 1.0
 var _bounds: AABB
+var excluded_ground: Array[Rect2] = []
 
 
 func _ready() -> void:
@@ -199,24 +204,43 @@ func reset_snow(multiplier: float) -> void:
 
 func save_state() -> Dictionary:
 	var state := {}
-	for chunk in _chunks.values():
+	for tile in _modified:
+		var chunk := _chunks[tile]
 		state[String(chunk.name)] = chunk.save_state()
 	return state
 
 
 func restore_state(state: Dictionary, multiplier: float) -> void:
+	multiplier = snowfall_multiplier(multiplier)
+	var modified: Dictionary[Vector2i, bool] = {}
 	for chunk in _chunks.values():
-		chunk.restore_state(state.get(String(chunk.name), {}), multiplier)
+		var chunk_state: Dictionary = state.get(String(chunk.name), {})
+		if not chunk_state.is_empty():
+			modified[chunk.tile] = true
+		elif not _modified.has(chunk.tile) and multiplier == _snowfall_multiplier:
+			continue
+		chunk.restore_state(chunk_state, multiplier)
 		if collision_enabled:
 			chunk.rebuild_collision(self)
 		_collision_dirty.erase(chunk.tile)
 		_dirty[chunk.tile] = chunk
+		_queue_neighbor(chunk.tile + Vector2i.LEFT)
+		_queue_neighbor(chunk.tile + Vector2i.RIGHT)
+		_queue_neighbor(chunk.tile + Vector2i.UP)
+		_queue_neighbor(chunk.tile + Vector2i.DOWN)
+	_modified = modified
+	_snowfall_multiplier = multiplier
 	set_process(not _dirty.is_empty())
 	snow_amount_changed.emit()
 
 
+func snowfall_multiplier(multiplier: float) -> float:
+	return multiplier if scale_snowfall else 1.0
+
+
 func _queue_edit(chunk: SnowChunk, index: int, update_collision: bool) -> void:
 	_dirty[chunk.tile] = chunk
+	_modified[chunk.tile] = true
 	if update_collision and collision_enabled:
 		_collision_dirty[chunk.tile] = true
 	var side := cells_per_chunk + 1
@@ -284,7 +308,22 @@ func _sample_tile(sample: Vector2i) -> Vector2i:
 func contains_ground(point: Vector3) -> bool:
 	var local := to_local(point)
 	var tile := Vector2i((Vector2(local.x, local.z) / chunk_size).floor())
-	return _chunks.has(tile)
+	return _chunks.has(tile) and allows_snow_at(Vector2(local.x, local.z))
+
+
+func allows_snow_at(point: Vector2) -> bool:
+	for area in excluded_ground:
+		if area.has_point(point):
+			return false
+	return true
+
+
+func ground_rects() -> Array[Rect2]:
+	var areas: Array[Rect2] = []
+	for chunk in _chunks.values():
+		var corner := to_global(chunk.position)
+		areas.append(Rect2(Vector2(corner.x, corner.z), Vector2.ONE * chunk_size))
+	return areas
 
 
 func overlaps_ray_footprint(local_from: Vector3, local_to: Vector3) -> bool:

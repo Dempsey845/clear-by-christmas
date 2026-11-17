@@ -23,24 +23,49 @@
 [ext_resource type="Resource" path="res://Jobs/Requests/4_holly_lane.tres" id="18"]
 [ext_resource type="Resource" path="res://Jobs/Requests/8_holly_lane.tres" id="19"]
 [ext_resource type="PackedScene" path="res://Town/home_interior.tscn" id="20"]
+[ext_resource type="PackedScene" path="res://Vehicles/snow_truck.tscn" id="21"]
+[ext_resource type="PackedScene" path="res://Vehicles/truck_garage.tscn" id="22"]
+[ext_resource type="PackedScene" path="res://Town/neighborhood.tscn" id="23"]
+[ext_resource type="Script" path="res://Town/town_snow.gd" id="24"]
+[ext_resource type="PackedScene" path="res://Town/telephone_box.tscn" id="25"]
+[ext_resource type="Shader" path="res://Town/winter_sky.gdshader" id="26"]
+[ext_resource type="Script" path="res://Town/town_clock.gd" id="27"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k1v75"]
+[sub_resource type="ShaderMaterial" id="WinterSky"]
 resource_local_to_scene = true
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+shader = ExtResource("26")
 
 [sub_resource type="Sky" id="Sky_nnixl"]
 resource_local_to_scene = true
-sky_material = SubResource("ProceduralSkyMaterial_k1v75")
+radiance_size = 3
+process_mode = 3
+sky_material = SubResource("WinterSky")
 
 [sub_resource type="Environment" id="Environment_f2mr4"]
 resource_local_to_scene = true
 background_mode = 2
 sky = SubResource("Sky_nnixl")
+ambient_light_source = 2
+ambient_light_color = Color(0.78, 0.86, 1, 1)
+ambient_light_energy = 0.64
+reflected_light_source = 2
 glow_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xqlys"]
-albedo_color = Color(0.27387273, 0.27387273, 0.27387273, 1)
+albedo_color = Color(0.31, 0.36, 0.35, 1)
+roughness = 0.98
+
+[sub_resource type="StandardMaterial3D" id="ServiceConcrete"]
+albedo_color = Color(0.23, 0.27, 0.27, 1)
+roughness = 0.92
+
+[sub_resource type="BoxMesh" id="GarageCourt"]
+material = SubResource("ServiceConcrete")
+size = Vector3(16, 0.01, 16)
+
+[sub_resource type="BoxMesh" id="MarketCourt"]
+material = SubResource("ServiceConcrete")
+size = Vector3(12, 0.01, 8)
 
 [node name="Town" type="Node3D" unique_id=1472099968]
 script = ExtResource("16")
@@ -56,11 +81,13 @@ shadow_enabled = true
 use_collision = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D" unique_id=177329441]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
-size = Vector3(100, 1, 100)
+position = Vector3(18, -0.5, -45)
+size = Vector3(152, 1, 220)
 material = SubResource("StandardMaterial3D_xqlys")
 
 [node name="Player" parent="." unique_id=2118284816 instance=ExtResource("1_k1v75")]
+position = Vector3(0, 0, 16.5)
+rotation_degrees = Vector3(0, 180, 0)
 
 [node name="RoadSnow" parent="." unique_id=683135024 instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
@@ -84,6 +111,7 @@ initial_depth = 0.24
 [node name="Holly12Dump" parent="RoadSnow" instance=ExtResource("3")]
 position = Vector3(8, 0, -4)
 initial_depth = 0.0
+pile_height = 0.48
 
 [node name="Holly12" parent="." instance=ExtResource("9")]
 position = Vector3(4, 0, -10.28)
@@ -104,6 +132,7 @@ initial_depth = 0.42
 [node name="Dump" parent="Holly18Snow" instance=ExtResource("3")]
 position = Vector3(4, 0, 4)
 initial_depth = 0.0
+pile_height = 0.48
 
 [node name="Holly12JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
 position = Vector3(4, 0, -7)
@@ -129,6 +158,7 @@ initial_depth = 0.045
 [node name="Dump" parent="Holly4Snow" instance=ExtResource("3")]
 position = Vector3(2.5, 0, 0)
 initial_depth = 0.0
+pile_height = 0.36
 
 [node name="Holly4JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
 position = Vector3(10.25, 0, -2.75)
@@ -149,54 +179,51 @@ initial_depth = 0.085
 [node name="Dump" parent="Holly8Snow" instance=ExtResource("3")]
 position = Vector3(3.0, 0, 0)
 initial_depth = 0.0
+pile_height = 0.40
 
 [node name="Holly8JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
 position = Vector3(19.5, 0, -3.0)
 site_id = &"holly_8"
 lawn_chunks = [NodePath("../Holly8Snow/Lawn")]
 
-[node name="Holly4DumpSign" type="Label3D" parent="."]
-position = Vector3(12.75, 0.8, -2.75)
-billboard = 1
-pixel_size = 0.006
-modulate = Color(0.85, 0.95, 1, 1)
-text = "Snow pile"
-font_size = 28
-outline_size = 8
+[node name="TruckGarage" parent="." instance=ExtResource("22")]
+position = Vector3(-20, 0, 34)
+rotation_degrees = Vector3(0, 180, 0)
 
-[node name="Holly8DumpSign" type="Label3D" parent="."]
-position = Vector3(22.5, 0.8, -3)
-billboard = 1
-pixel_size = 0.006
-modulate = Color(0.85, 0.95, 1, 1)
-text = "Snow pile"
-font_size = 28
-outline_size = 8
+[node name="GarageCourt" type="MeshInstance3D" parent="."]
+position = Vector3(-20, 0, 32)
+mesh = SubResource("GarageCourt")
 
-[node name="Holly12DumpSign" type="Label3D" parent="."]
-position = Vector3(8, 0.8, -7)
-billboard = 1
-pixel_size = 0.006
-modulate = Color(0.85, 0.95, 1, 1)
-text = "Snow pile"
-font_size = 28
-outline_size = 8
+[node name="MarketCourt" type="MeshInstance3D" parent="."]
+position = Vector3(14, 0, 28)
+mesh = SubResource("MarketCourt")
 
-[node name="Holly18DumpSign" type="Label3D" parent="."]
-position = Vector3(-4, 0.8, -6)
-billboard = 1
-pixel_size = 0.006
-modulate = Color(0.85, 0.95, 1, 1)
-text = "Snow pile"
-font_size = 28
-outline_size = 8
+[node name="SnowTruck" parent="." instance=ExtResource("21")]
+position = Vector3(-20, 0.72, 26.75)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="TelephoneBox" parent="." instance=ExtResource("25")]
+position = Vector3(-14.7, 0, 27.5)
+rotation_degrees = Vector3(0, 180, 0)
+
+[node name="Neighborhood" parent="." instance=ExtResource("23")]
+
+[node name="TownSnow" type="Node3D" parent="." node_paths=PackedStringArray("legacy_fields") groups=["snow_fields"]]
+script = ExtResource("24")
+cells_per_chunk = 16
+mesh_updates_per_frame = 64
+drift_seed = 41
+collision_min_depth = 0.065
+scale_snowfall = false
+legacy_fields = [NodePath("../RoadSnow"), NodePath("../Holly18Snow"), NodePath("../Holly4Snow"), NodePath("../Holly8Snow")]
 
 [node name="JobBoard" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4")]
 player = NodePath("../Player")
 requests = Array[ExtResource("8")]([ExtResource("18"), ExtResource("19"), ExtResource("6"), ExtResource("7")])
 
 [node name="ToolMarket" parent="." node_paths=PackedStringArray("player", "snow_tools", "job_board") instance=ExtResource("10")]
-position = Vector3(4, 0, -1.55)
+position = Vector3(14, 0, 28.5)
+rotation_degrees = Vector3(0, 180, 0)
 player = NodePath("../Player")
 snow_tools = NodePath("../Player/Head/Camera3D/SnowTools")
 job_board = NodePath("../JobBoard")
@@ -230,6 +257,9 @@ position = Vector3(4, 0, 9.75)
 
 [node name="HomeInterior" parent="." instance=ExtResource("20")]
 position = Vector3(128, 0, 0)
+
+[node name="TownClock" type="Node" parent="."]
+script = ExtResource("27")
 
 [node name="HomeHUD" type="CanvasLayer" parent="."]
 
