@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[sub_resource type="StandardMaterial3D" id="Paint"]
+albedo_color = Color(0.64, 0.20, 0.08, 1)
+
+[sub_resource type="StandardMaterial3D" id="Steel"]
+albedo_color = Color(0.15, 0.18, 0.20, 1)
+metallic = 0.38
+
+[sub_resource type="BoxMesh" id="Housing"]
+material = SubResource("Paint")
+size = Vector3(2.48, 0.48, 0.72)
+
+[sub_resource type="CylinderMesh" id="Auger"]
+material = SubResource("Steel")
+top_radius = 0.18
+bottom_radius = 0.18
+height = 2.25
+
+[sub_resource type="BoxMesh" id="Chute"]
+material = SubResource("Paint")
+size = Vector3(0.26, 0.64, 0.26)
+
+[node name="TruckBlower" type="Node3D"]
+
+[node name="Housing" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0, -0.36)
+mesh = SubResource("Housing")
+
+[node name="Auger" type="MeshInstance3D" parent="."]
+position = Vector3(0, -0.05, -0.73)
+rotation_degrees = Vector3(0, 0, 90)
+mesh = SubResource("Auger")
+
+[node name="SideChute" type="MeshInstance3D" parent="."]
+position = Vector3(0.78, 0.39, -0.42)
+rotation_degrees = Vector3(0, 0, -42)
+mesh = SubResource("Chute")

@@ -1,24 +1,19 @@
 [gd_scene format=3 uid="uid://co8agcwwxlu85"]
 
 [ext_resource type="PackedScene" uid="uid://bvllvr25njqo1" path="res://Player/player.tscn" id="1_k1v75"]
-[ext_resource type="PackedScene" path="res://Snow/snow_field.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://Snow/snow_chunk.tscn" id="3"]
-
 [ext_resource type="PackedScene" path="res://Jobs/job_board.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://Jobs/snow_job_site.tscn" id="5"]
 [ext_resource type="Resource" path="res://Jobs/Requests/12_holly_lane.tres" id="6"]
 [ext_resource type="Resource" path="res://Jobs/Requests/18_holly_lane.tres" id="7"]
-[ext_resource type="Script" path="res://Jobs/snow_job.gd" id="8"]
-[ext_resource type="PackedScene" path="res://Jobs/sample_house.tscn" id="9"]
-
+[ext_resource type="Script" uid="uid://bt245aiyk6l1u" path="res://Jobs/snow_job.gd" id="8"]
+[ext_resource type="PackedScene" uid="uid://divnfegkiuobs" path="res://Jobs/sample_house.tscn" id="9"]
 [ext_resource type="PackedScene" path="res://Market/tool_market.tscn" id="10"]
-[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="11"]
+[ext_resource type="Script" uid="uid://comf3yubm3y7k" path="res://Tools/snow_tool_data.gd" id="11"]
 [ext_resource type="Resource" path="res://Tools/Catalog/wide_scoop.tres" id="12"]
 [ext_resource type="Resource" path="res://Tools/Catalog/drift_scoop.tres" id="13"]
 [ext_resource type="Resource" path="res://Tools/Catalog/power_suction.tres" id="14"]
 [ext_resource type="Resource" path="res://Tools/Catalog/pro_suction.tres" id="15"]
-
-[ext_resource type="Script" path="res://Town/town.gd" id="16"]
+[ext_resource type="Script" uid="uid://k18snlt5q2d2" path="res://Town/town.gd" id="16"]
 [ext_resource type="Resource" path="res://Tools/Catalog/compact_vacuum.tres" id="17"]
 [ext_resource type="Resource" path="res://Jobs/Requests/4_holly_lane.tres" id="18"]
 [ext_resource type="Resource" path="res://Jobs/Requests/8_holly_lane.tres" id="19"]
@@ -26,20 +21,24 @@
 [ext_resource type="PackedScene" path="res://Vehicles/snow_truck.tscn" id="21"]
 [ext_resource type="PackedScene" path="res://Vehicles/truck_garage.tscn" id="22"]
 [ext_resource type="PackedScene" path="res://Town/neighborhood.tscn" id="23"]
-[ext_resource type="Script" path="res://Town/town_snow.gd" id="24"]
+[ext_resource type="Script" uid="uid://bq4x3nigdwmty" path="res://Town/town_snow.gd" id="24"]
 [ext_resource type="PackedScene" path="res://Town/telephone_box.tscn" id="25"]
-[ext_resource type="Shader" path="res://Town/winter_sky.gdshader" id="26"]
-[ext_resource type="Script" path="res://Town/town_clock.gd" id="27"]
+[ext_resource type="Shader" uid="uid://blpkn1iavhgsh" path="res://Town/winter_sky.gdshader" id="26"]
+[ext_resource type="Script" uid="uid://concseqhvcrlj" path="res://Town/town_clock.gd" id="27"]
+[ext_resource type="Resource" path="res://Tools/Catalog/contractor_shovel.tres" id="28"]
+[ext_resource type="Resource" path="res://Tools/Catalog/cyclone_vacuum.tres" id="29"]
+[ext_resource type="PackedScene" path="res://Town/save_menu.tscn" id="30"]
 
 [sub_resource type="ShaderMaterial" id="WinterSky"]
 resource_local_to_scene = true
 shader = ExtResource("26")
+shader_parameter/sun_direction = Vector3(0.85, 0.3, -0.44)
+shader_parameter/daylight = 0.85
 
 [sub_resource type="Sky" id="Sky_nnixl"]
 resource_local_to_scene = true
-radiance_size = 3
-process_mode = 3
 sky_material = SubResource("WinterSky")
+process_mode = 3
 
 [sub_resource type="Environment" id="Environment_f2mr4"]
 resource_local_to_scene = true
@@ -81,195 +80,125 @@ shadow_enabled = true
 use_collision = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="CSGCombiner3D" unique_id=177329441]
-position = Vector3(18, -0.5, -45)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, -0.5, -45)
 size = Vector3(152, 1, 220)
 material = SubResource("StandardMaterial3D_xqlys")
 
 [node name="Player" parent="." unique_id=2118284816 instance=ExtResource("1_k1v75")]
-position = Vector3(0, 0, 16.5)
-rotation_degrees = Vector3(0, 180, 0)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 16.5)
 
-[node name="RoadSnow" parent="." unique_id=683135024 instance=ExtResource("2")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -5)
+[node name="Holly12" parent="." unique_id=1256079434 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -10.28)
 
-[node name="RoadNear" parent="RoadSnow" unique_id=1007323244 instance=ExtResource("3")]
-initial_depth = 0.28
+[node name="Holly18" parent="." unique_id=1614347886 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -13.28)
 
-[node name="RoadDrift" parent="RoadSnow" unique_id=30475574 instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -4)
-initial_depth = 0.90
+[node name="Holly4" parent="." unique_id=897971826 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.25, 0, -5.45)
 
-[node name="RoadFar" parent="RoadSnow" unique_id=1769406772 instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
-initial_depth = 0.33
+[node name="Holly8" parent="." unique_id=311632004 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 0, -5.95)
 
-[node name="SidePath" parent="RoadSnow" unique_id=1394625358 instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, -4)
-initial_depth = 0.24
-
-
-[node name="Holly12Dump" parent="RoadSnow" instance=ExtResource("3")]
-position = Vector3(8, 0, -4)
-initial_depth = 0.0
-pile_height = 0.48
-
-[node name="Holly12" parent="." instance=ExtResource("9")]
-position = Vector3(4, 0, -10.28)
-
-[node name="Holly18" parent="." instance=ExtResource("9")]
-position = Vector3(-6, 0, -13.28)
-
-[node name="Holly18Snow" parent="." instance=ExtResource("2")]
-position = Vector3(-10, 0, -12)
-
-[node name="LawnWest" parent="Holly18Snow" instance=ExtResource("3")]
-initial_depth = 0.32
-
-[node name="LawnEast" parent="Holly18Snow" instance=ExtResource("3")]
-position = Vector3(4, 0, 0)
-initial_depth = 0.42
-
-[node name="Dump" parent="Holly18Snow" instance=ExtResource("3")]
-position = Vector3(4, 0, 4)
-initial_depth = 0.0
-pile_height = 0.48
-
-[node name="Holly12JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
-position = Vector3(4, 0, -7)
-site_id = &"holly_12"
-lawn_chunks = [NodePath("../RoadSnow/SidePath")]
-
-[node name="Holly18JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
-position = Vector3(-6, 0, -10)
-site_id = &"holly_18"
-lawn_chunks = [NodePath("../Holly18Snow/LawnWest"), NodePath("../Holly18Snow/LawnEast")]
-
-[node name="Holly4" parent="." instance=ExtResource("9")]
-position = Vector3(10.25, 0, -5.45)
-
-[node name="Holly4Snow" parent="." instance=ExtResource("2")]
-position = Vector3(9.0, 0, -4.0)
-chunk_size = 2.5
-drift_seed = 32
-
-[node name="Lawn" parent="Holly4Snow" instance=ExtResource("3")]
-initial_depth = 0.045
-
-[node name="Dump" parent="Holly4Snow" instance=ExtResource("3")]
-position = Vector3(2.5, 0, 0)
-initial_depth = 0.0
-pile_height = 0.36
-
-[node name="Holly4JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
-position = Vector3(10.25, 0, -2.75)
+[node name="Holly4JobSite" parent="." unique_id=46406703 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.401276, 0, -2.100319)
 site_id = &"holly_4"
-lawn_chunks = [NodePath("../Holly4Snow/Lawn")]
+lawn_depth_bonus = 0.015
 
-[node name="Holly8" parent="." instance=ExtResource("9")]
-position = Vector3(19.5, 0, -5.95)
-
-[node name="Holly8Snow" parent="." instance=ExtResource("2")]
-position = Vector3(18.0, 0, -4.5)
-chunk_size = 3.0
-drift_seed = 36
-
-[node name="Lawn" parent="Holly8Snow" instance=ExtResource("3")]
-initial_depth = 0.085
-
-[node name="Dump" parent="Holly8Snow" instance=ExtResource("3")]
-position = Vector3(3.0, 0, 0)
-initial_depth = 0.0
-pile_height = 0.40
-
-[node name="Holly8JobSite" parent="." node_paths=PackedStringArray("lawn_chunks") instance=ExtResource("5")]
-position = Vector3(19.5, 0, -3.0)
+[node name="Holly8JobSite" parent="." unique_id=1940091017 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.738857, 0, -2.4681542)
 site_id = &"holly_8"
-lawn_chunks = [NodePath("../Holly8Snow/Lawn")]
+lawn_depth_bonus = 0.025
 
-[node name="TruckGarage" parent="." instance=ExtResource("22")]
-position = Vector3(-20, 0, 34)
-rotation_degrees = Vector3(0, 180, 0)
+[node name="Holly12JobSite" parent="." unique_id=946379493 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9936256, 0, -6.2340775)
+site_id = &"holly_12"
+lawn_depth_bonus = 0.04
 
-[node name="GarageCourt" type="MeshInstance3D" parent="."]
-position = Vector3(-20, 0, 32)
+[node name="Holly18JobSite" parent="." unique_id=1129244217 instance=ExtResource("5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0, -10)
+site_id = &"holly_18"
+lawn_depth_bonus = 0.055
+
+[node name="TruckGarage" parent="." unique_id=583599368 instance=ExtResource("22")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -20, 0, 34)
+
+[node name="GarageCourt" type="MeshInstance3D" parent="." unique_id=591164311]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, 32)
 mesh = SubResource("GarageCourt")
 
-[node name="MarketCourt" type="MeshInstance3D" parent="."]
-position = Vector3(14, 0, 28)
+[node name="MarketCourt" type="MeshInstance3D" parent="." unique_id=1575904846]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 28)
 mesh = SubResource("MarketCourt")
 
-[node name="SnowTruck" parent="." instance=ExtResource("21")]
-position = Vector3(-20, 0.72, 26.75)
-rotation_degrees = Vector3(0, 180, 0)
+[node name="SnowTruck" parent="." unique_id=1402901089 instance=ExtResource("21")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -20, 0.72, 26.75)
 
-[node name="TelephoneBox" parent="." instance=ExtResource("25")]
-position = Vector3(-14.7, 0, 27.5)
-rotation_degrees = Vector3(0, 180, 0)
+[node name="TelephoneBox" parent="." unique_id=1922532814 instance=ExtResource("25")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -14.7, 0, 27.5)
 
-[node name="Neighborhood" parent="." instance=ExtResource("23")]
+[node name="Neighborhood" parent="." unique_id=153282526 instance=ExtResource("23")]
 
-[node name="TownSnow" type="Node3D" parent="." node_paths=PackedStringArray("legacy_fields") groups=["snow_fields"]]
+[node name="TownSnow" type="Node3D" parent="." unique_id=381066820 node_paths=PackedStringArray("opening_lawns") groups=["snow_fields"]]
 script = ExtResource("24")
+opening_lawns = [NodePath("../Holly4JobSite"), NodePath("../Holly8JobSite"), NodePath("../Holly12JobSite"), NodePath("../Holly18JobSite")]
 cells_per_chunk = 16
 mesh_updates_per_frame = 64
 drift_seed = 41
 collision_min_depth = 0.065
 scale_snowfall = false
-legacy_fields = [NodePath("../RoadSnow"), NodePath("../Holly18Snow"), NodePath("../Holly4Snow"), NodePath("../Holly8Snow")]
 
-[node name="JobBoard" parent="." node_paths=PackedStringArray("player") instance=ExtResource("4")]
+[node name="JobBoard" parent="." unique_id=1724267247 node_paths=PackedStringArray("player") instance=ExtResource("4")]
 player = NodePath("../Player")
 requests = Array[ExtResource("8")]([ExtResource("18"), ExtResource("19"), ExtResource("6"), ExtResource("7")])
 
-[node name="ToolMarket" parent="." node_paths=PackedStringArray("player", "snow_tools", "job_board") instance=ExtResource("10")]
-position = Vector3(14, 0, 28.5)
-rotation_degrees = Vector3(0, 180, 0)
+[node name="ToolMarket" parent="." unique_id=1666911949 node_paths=PackedStringArray("player", "snow_tools", "job_board") instance=ExtResource("10")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 14, 0, 28.5)
 player = NodePath("../Player")
 snow_tools = NodePath("../Player/Head/Camera3D/SnowTools")
 job_board = NodePath("../JobBoard")
-catalog = Array[ExtResource("11")]([ExtResource("12"), ExtResource("13"), ExtResource("17"), ExtResource("14"), ExtResource("15")])
+catalog = Array[ExtResource("11")]([ExtResource("12"), ExtResource("13"), ExtResource("28"), ExtResource("17"), ExtResource("14"), ExtResource("15"), ExtResource("29")])
 
-[node name="PlayerHouse" parent="." instance=ExtResource("9")]
-position = Vector3(4, 0, 8)
+[node name="PlayerHouse" parent="." unique_id=577696389 instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 8)
 
-[node name="HomeSign" type="Label3D" parent="PlayerHouse"]
-position = Vector3(0, 2.55, 1.28)
+[node name="HomeSign" type="Label3D" parent="PlayerHouse" unique_id=365672114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, 1.28)
 pixel_size = 0.009
 text = "YOUR HOUSE"
-font_size = 32
 outline_size = 8
 
-[node name="HomeMarker" type="Label3D" parent="."]
+[node name="HomeMarker" type="Label3D" parent="." unique_id=588462093]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.55, 8)
 visible = false
-position = Vector3(4, 3.55, 8)
+pixel_size = 0.0032
 billboard = 1
 no_depth_test = true
 fixed_size = true
-pixel_size = 0.0032
-font_size = 34
-outline_size = 13
 modulate = Color(1, 0.86, 0.62, 1)
 outline_modulate = Color(0.14, 0.08, 0.04, 1)
 text = "Your house"
+font_size = 34
+outline_size = 13
 
-[node name="HomeDoor" type="Marker3D" parent="."]
-position = Vector3(4, 0, 9.75)
+[node name="HomeDoor" type="Marker3D" parent="." unique_id=849784373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 9.75)
 
-[node name="HomeInterior" parent="." instance=ExtResource("20")]
-position = Vector3(128, 0, 0)
+[node name="HomeInterior" parent="." unique_id=847609653 instance=ExtResource("20")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 128, 0, 0)
 
-[node name="TownClock" type="Node" parent="."]
+[node name="TownClock" type="Node" parent="." unique_id=499880338]
 script = ExtResource("27")
 
-[node name="HomeHUD" type="CanvasLayer" parent="."]
+[node name="SaveMenu" parent="." unique_id=372158130 instance=ExtResource("30")]
 
-[node name="Prompt" type="Label" parent="HomeHUD"]
-anchor_left = 0.0
+[node name="HomeHUD" type="CanvasLayer" parent="." unique_id=1095574144]
+
+[node name="Prompt" type="Label" parent="HomeHUD" unique_id=1599322439]
+anchors_preset = -1
 anchor_top = 0.68
 anchor_right = 1.0
 anchor_bottom = 0.68
-horizontal_alignment = 1
-mouse_filter = 2
 theme_override_colors/font_outline_color = Color(0.05, 0.1, 0.14, 1)
 theme_override_constants/outline_size = 8
 theme_override_font_sizes/font_size = 21
+horizontal_alignment = 1

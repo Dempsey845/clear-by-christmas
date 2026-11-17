@@ -1,12 +1,17 @@
 class_name SnowTruck
 extends RigidBody3D
 
-enum Attachment { NONE, SCOOP, VACUUM }
+enum Attachment { NONE, SCOOP, VACUUM, BLOWER, WIDE_BUCKET }
+enum Upgrade { WINTER_TYRES, HEATED_WHEELS, EXTENDED_TANK }
 
 const PRICE := 18
+const PURCHASE_JOBS := 9
 const SCOOP_PRICE := 12
 const VACUUM_PRICE := 25
-const CAPACITIES := [0.0, 0.65, 1.25]
+const BLOWER_PRICE := 48
+const WIDE_BUCKET_PRICE := 72
+const CAPACITIES := [0.0, 0.65, 1.25, 0.0, 1.05]
+const EXTENDED_CAPACITY := 2.0
 const WHEEL_RADIUS := 0.40
 const SPRING_LENGTH := 0.56
 const TRAVEL := 0.30
@@ -14,6 +19,8 @@ const SPRING_RATE := 15500.0
 const DAMPING := 2200.0
 const PARK_SPEED := 0.7
 const SNOW_INTERVAL := 0.10
+const HEAT_INTERVAL := 0.15
+const MELT_DEPTH_PER_SECOND := 0.055
 
 ## Visual scenes use +Y up and -Z forward. Their roots attach directly to the markers in the truck scene.
 @export var body_visual: PackedScene
@@ -22,6 +29,9 @@ const SNOW_INTERVAL := 0.10
 @export var scoop_visual: PackedScene
 @export var vacuum_nozzle_visual: PackedScene
 @export var vacuum_tank_visual: PackedScene
+@export var blower_visual: PackedScene
+@export var wide_bucket_visual: PackedScene
+@export var heated_wheel_visual: PackedScene
 
 @onready var camera: Camera3D = $ChaseCamera
 @onready var _wheels: Array[Node] = $Suspension.get_children()
@@ -32,6 +42,10 @@ var controls_locked := false
 var attachment := Attachment.NONE
 var owns_scoop := false
 var owns_vacuum := false
+var owns_blower := false
+var owns_wide_bucket := false
+var upgrades: Array[int] = []
+var heating := false
 var cargo := 0.0
 var feedback := ""
 
@@ -45,6 +59,12 @@ var _orbit_delay := 0.0
 var _scoop_model: Node3D
 var _nozzle_model: Node3D
 var _tank_model: Node3D
+var _blower_model: Node3D
+var _wide_bucket_model: Node3D
+var _heater_models: Array[Node3D] = []
+var _wheel_ground := PackedVector3Array()
+var _wheel_loaded := PackedByteArray()
+var _heat_elapsed := 0.0
 var _query := PhysicsRayQueryParameters3D.new()
 
 
@@ -54,13 +74,20 @@ func _ready() -> void:
 	_query.collision_mask = 3
 	_mount_visual($BodyMount, body_visual)
 	for wheel: Node3D in _wheels:
-		_mount_visual(wheel.get_node("Steer/Roll"), wheel_visual)
+		var hub: Node3D = wheel.get_node("Steer/Roll")
+		_mount_visual(hub, wheel_visual)
+		_heater_models.append(_mount_visual(hub, heated_wheel_visual))
 		_contacts.append(Vector2(SPRING_LENGTH, 0.0))
+	_wheel_ground.resize(_wheels.size())
+	_wheel_loaded.resize(_wheels.size())
 	_scoop_model = _mount_visual($FrontMount/ScoopHinge, scoop_visual)
 	_nozzle_model = _mount_visual($FrontMount, vacuum_nozzle_visual)
 	_tank_model = _mount_visual($BedMount, vacuum_tank_visual)
+	_blower_model = _mount_visual($FrontMount, blower_visual)
+	_wide_bucket_model = _mount_visual($FrontMount/ScoopHinge, wide_bucket_visual)
 	$ChaseCamera.top_level = true
 	_update_attachment()
+	_update_heat_visuals()
 
 
 func _mount_visual(mount: Node3D, scene: PackedScene) -> Node3D:
@@ -81,8 +108,12 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 	var speed := state.linear_velocity.dot(forward)
 	var limit := lerpf(0.54, 0.24, clampf(absf(speed) / 12.0, 0.0, 1.0))
 	_steer = move_toward(_steer, steering * limit, state.step * 2.7)
+	var winter_tyres := has_upgrade(Upgrade.WINTER_TYRES)
+	var grip := 1.68 if winter_tyres else 1.35
+	var cornering_grip := 3600.0 if winter_tyres else 3000.0
 
 	for index in _wheels.size():
+		_wheel_loaded[index] = 0
 		var wheel := _wheels[index] as Node3D
 		var anchor := state.transform * wheel.position
 		var steer := _steer if wheel.position.z < 0.0 else 0.0
@@ -104,6 +135,9 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 			(SPRING_LENGTH - length) * SPRING_RATE - velocity.dot(basis.y) * DAMPING,
 			0.0, 13000.0
 		)
+		if driving and heating and load > 80.0:
+			_wheel_ground[index] = contact
+			_wheel_loaded[index] = 1
 		_contacts[index].x = length
 		tire_forward = tire_forward.slide(normal).normalized()
 		var tire_right := tire_forward.cross(normal).normalized()
@@ -117,8 +151,8 @@ func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:
 			motor = 0.0
 			rolling_drag = 3600.0
 		var traction := tire_forward * (motor - rolling_speed * rolling_drag)
-		traction -= tire_right * velocity.dot(tire_right) * 3000.0
-		state.apply_force(basis.y * load + traction.limit_length(load * 1.35), lever)
+		traction -= tire_right * velocity.dot(tire_right) * cornering_grip
+		state.apply_force(basis.y * load + traction.limit_length(load * grip), lever)
 
 
 func _physics_process(delta: float) -> void:
@@ -134,17 +168,27 @@ func _physics_process(delta: float) -> void:
 	if not driving:
 		return
 	_update_camera(delta)
-	if controls_locked or attachment == Attachment.NONE:
+	if controls_locked:
 		_collection_time = 0.0
+		_heat_elapsed = 0.0
 		return
-	if Input.is_action_just_pressed("snow_dump"):
+	if has_upgrade(Upgrade.HEATED_WHEELS) and Input.is_action_just_pressed("toggle_wheel_heat"):
+		set_heating(not heating)
+	if heating:
+		_melt_under_wheels(delta)
+	if attachment == Attachment.NONE:
+		return
+	if attachment != Attachment.BLOWER and Input.is_action_just_pressed("snow_dump"):
 		_dump_snow()
 		_collection_time = 0.0
 	elif Input.is_action_pressed("snow_use"):
 		_collection_time -= delta
 		if _collection_time <= 0.0:
 			_collection_time = SNOW_INTERVAL
-			_collect_snow()
+			if attachment == Attachment.BLOWER:
+				_blow_snow()
+			else:
+				_collect_snow()
 	else:
 		_collection_time = 0.0
 
@@ -156,6 +200,9 @@ func can_park() -> bool:
 func set_driving(active: bool) -> void:
 	driving = active
 	feedback = ""
+	_heat_elapsed = 0.0
+	_wheel_loaded.fill(0)
+	_update_heat_visuals()
 	if active:
 		sleeping = false
 		_orbit_yaw = 0.0
@@ -218,6 +265,46 @@ func equip(item: Attachment) -> void:
 	_update_attachment()
 
 
+func owns_attachment(item: Attachment) -> bool:
+	match item:
+		Attachment.SCOOP: return owns_scoop
+		Attachment.VACUUM: return owns_vacuum
+		Attachment.BLOWER: return owns_blower
+		Attachment.WIDE_BUCKET: return owns_wide_bucket
+	return item == Attachment.NONE
+
+
+func unlock_attachment(item: Attachment) -> void:
+	match item:
+		Attachment.SCOOP: owns_scoop = true
+		Attachment.VACUUM: owns_vacuum = true
+		Attachment.BLOWER: owns_blower = true
+		Attachment.WIDE_BUCKET: owns_wide_bucket = true
+
+
+func has_upgrade(item: Upgrade) -> bool:
+	return item in upgrades
+
+
+func cargo_capacity() -> float:
+	if attachment == Attachment.VACUUM and has_upgrade(Upgrade.EXTENDED_TANK):
+		return EXTENDED_CAPACITY
+	return CAPACITIES[attachment]
+
+
+func set_heating(enabled: bool) -> void:
+	heating = enabled and has_upgrade(Upgrade.HEATED_WHEELS)
+	_heat_elapsed = 0.0
+	_wheel_loaded.fill(0)
+	_update_heat_visuals()
+
+
+func _update_heat_visuals() -> void:
+	for model in _heater_models:
+		if model != null:
+			model.visible = heating and driving
+
+
 func _update_attachment() -> void:
 	if _scoop_model != null:
 		_scoop_model.visible = attachment == Attachment.SCOOP
@@ -225,10 +312,46 @@ func _update_attachment() -> void:
 		_nozzle_model.visible = attachment == Attachment.VACUUM
 	if _tank_model != null:
 		_tank_model.visible = attachment == Attachment.VACUUM
+	if _blower_model != null:
+		_blower_model.visible = attachment == Attachment.BLOWER
+	if _wide_bucket_model != null:
+		_wide_bucket_model.visible = attachment == Attachment.WIDE_BUCKET
+
+
+func _melt_under_wheels(delta: float) -> void:
+	_heat_elapsed += delta
+	if _heat_elapsed < HEAT_INTERVAL:
+		return
+	var depth := MELT_DEPTH_PER_SECOND * _heat_elapsed
+	_heat_elapsed = 0.0
+	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
+		for index in _wheel_ground.size():
+			var contact := _wheel_ground[index]
+			if _wheel_loaded[index] != 0 and field.contains_ground(contact):
+				field.cut(contact, -global_basis.z, Vector2(0.47, 0.72), depth, true)
+
+
+func _blow_snow() -> void:
+	var intake: Vector3 = $Intake.global_position
+	var outlet: Vector3 = $BlowerOutlet.global_position
+	if _ground_below(intake, 1.1).is_empty() or _ground_below(outlet, 1.6).is_empty():
+		return
+	var fields := get_tree().get_nodes_in_group("snow_fields")
+	for target: SnowField in fields:
+		if not target.can_deposit(outlet, 1.05):
+			continue
+		var removed := 0.0
+		for source: SnowField in fields:
+			removed += source.cut(intake, -global_basis.z, Vector2(2.60, 1.20), 0.12, false)
+		if removed > 0.0:
+			target.deposit(outlet, 1.05, removed)
+		feedback = ""
+		return
+	feedback = "Keep the right chute over snowy ground"
 
 
 func _collect_snow() -> void:
-	var remaining := float(CAPACITIES[attachment]) - cargo
+	var remaining := cargo_capacity() - cargo
 	if remaining <= 0.00001:
 		feedback = "Full · RMB to dump"
 		return
@@ -238,6 +361,9 @@ func _collect_snow() -> void:
 	var vacuum := attachment == Attachment.VACUUM
 	var size := Vector2(2.35, 1.8) if vacuum else Vector2(2.30, 1.05)
 	var depth := 0.095 if vacuum else 0.15
+	if attachment == Attachment.WIDE_BUCKET:
+		size = Vector2(2.85, 1.35)
+		depth = 0.19
 	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
 		var removed := field.cut(point, -global_basis.z, size, depth, vacuum, remaining)
 		cargo += removed
@@ -251,7 +377,8 @@ func _dump_snow() -> void:
 	if cargo <= 0.00001:
 		feedback = "No snow to dump"
 		return
-	var outlet: Marker3D = $Intake if attachment == Attachment.SCOOP else $RearOutlet
+	var front_dump := attachment == Attachment.SCOOP or attachment == Attachment.WIDE_BUCKET
+	var outlet: Marker3D = $Intake if front_dump else $RearOutlet
 	var ground := _ground_below(outlet.global_position, 2.0)
 	if not ground.is_empty():
 		var point: Vector3 = ground.position
@@ -259,11 +386,11 @@ func _dump_snow() -> void:
 			if field.contains_ground(point) and field.deposit(point, 0.85, cargo):
 				cargo = 0.0
 				feedback = "Snow dumped"
-				if attachment == Attachment.SCOOP:
+				if front_dump:
 					$FrontMount/ScoopHinge.rotation.x = -0.85
 				return
 	feedback = "Position the %s over a snow pile or clearing area" % (
-		"scoop" if attachment == Attachment.SCOOP else "rear outlet"
+		"bucket" if front_dump else "rear outlet"
 	)
 
 
@@ -280,7 +407,8 @@ func save_state() -> Dictionary:
 	return {
 		"owned": owned, "scoop": owns_scoop, "vacuum": owns_vacuum,
 		"attachment": attachment, "cargo": cargo, "transform": global_transform,
-		"driving": driving,
+		"driving": driving, "blower": owns_blower, "wide_bucket": owns_wide_bucket,
+		"upgrades": upgrades.duplicate(), "heating": heating,
 	}
 
 
@@ -288,15 +416,28 @@ func restore_state(state: Dictionary) -> void:
 	owned = state.get("owned", false) == true
 	owns_scoop = owned and state.get("scoop", false) == true
 	owns_vacuum = owned and state.get("vacuum", false) == true
+	owns_blower = owned and state.get("blower", false) == true
+	owns_wide_bucket = owned and state.get("wide_bucket", false) == true
+	upgrades.clear()
+	var saved_upgrades: Variant = state.get("upgrades", [])
+	if owned and saved_upgrades is Array:
+		for upgrade: int in Upgrade.values():
+			if upgrade in saved_upgrades:
+				upgrades.append(upgrade)
+	set_heating(state.get("heating", false) == true)
 	var item: Variant = state.get("attachment")
 	if item == Attachment.SCOOP and owns_scoop:
 		equip(Attachment.SCOOP)
 	elif item == Attachment.VACUUM and owns_vacuum:
 		equip(Attachment.VACUUM)
+	elif item == Attachment.BLOWER and owns_blower:
+		equip(Attachment.BLOWER)
+	elif item == Attachment.WIDE_BUCKET and owns_wide_bucket:
+		equip(Attachment.WIDE_BUCKET)
 	else:
 		equip(Attachment.NONE)
 	var volume: Variant = state.get("cargo", 0.0)
-	cargo = clampf(volume, 0.0, CAPACITIES[attachment]) if volume is float and is_finite(volume) else 0.0
+	cargo = clampf(volume, 0.0, cargo_capacity()) if volume is float and is_finite(volume) else 0.0
 	var parked_at: Variant = state.get("transform")
 	if owned and parked_at is Transform3D and parked_at.is_finite():
 		_place_truck(parked_at)

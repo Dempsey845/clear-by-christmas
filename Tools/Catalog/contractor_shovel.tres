@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SnowToolData" format=3]
+
+[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"contractor_shovel"
+display_name = "Contractor Shovel"
+kind = 0
+price = 22
+requires = &"drift_scoop"
+completed_jobs_required = 4
+area = Vector2(1.1, 1.18)
+depth = 0.37
+capacity_litres = 180.0
+dump_radius = 0.74
+color = Color(0.72, 0.39, 0.18, 1)

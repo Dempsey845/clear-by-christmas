@@ -99,6 +99,11 @@ market_interact={
 ]
 }
 
+toggle_wheel_heat={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":72)]
+}
+
 [layer_names]
 
 3d_physics/layer_2="Snow"

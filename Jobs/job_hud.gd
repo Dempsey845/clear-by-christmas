@@ -2,8 +2,7 @@ class_name JobHUD
 extends CanvasLayer
 
 signal accept_requested
-signal save_requested
-signal load_requested
+signal save_menu_requested
 signal phone_toggled(open: bool)
 
 const PHONE_HIDDEN := 460.0
@@ -23,8 +22,7 @@ func _ready() -> void:
 		close_phone()
 		accept_requested.emit()
 	)
-	%Save.pressed.connect(func() -> void: save_requested.emit())
-	%Load.pressed.connect(func() -> void: load_requested.emit())
+	%Saves.pressed.connect(func() -> void: save_menu_requested.emit())
 	%JobsTab.pressed.connect(_show_history.bind(false))
 	%HistoryTab.pressed.connect(_show_history.bind(true))
 	$NoticeTimer.timeout.connect(clear_notice)
@@ -119,10 +117,6 @@ func notify_payment(job: SnowJob) -> void:
 
 func clear_notice() -> void:
 	%Notice.hide()
-
-
-func set_save_status(message: String) -> void:
-	%SaveStatus.text = message
 
 
 func _show_history(show_history: bool) -> void:

@@ -49,7 +49,7 @@ func _show_market() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	%Prompt.hide()
 	%Shop.show()
-	%Feedback.text = ""
+	%Feedback.text = "Buy each shovel in order to unlock the vacuum range."
 	%Close.grab_focus()
 
 
@@ -76,10 +76,15 @@ func _choose_tool(tool: SnowToolData) -> void:
 	if not _open:
 		return
 	if not _owned[tool.id]:
+		if not _purchase_requirement(tool).is_empty():
+			return
 		if tool.price > 0 and not job_board.try_spend(tool.price):
 			return
 		_owned[tool.id] = true
-		%Feedback.text = "%s purchased. Select Equip to use it." % tool.display_name
+		if snow_tools.try_equip(tool):
+			%Feedback.text = "%s purchased and equipped." % tool.display_name
+		else:
+			%Feedback.text = "%s purchased. Empty your current tool before equipping it." % tool.display_name
 	elif snow_tools.try_equip(tool):
 		%Feedback.text = "%s equipped." % tool.display_name
 	else:
@@ -91,7 +96,17 @@ func _refresh_cards(balance: int) -> void:
 	%Balance.text = "Balance  £%d" % balance
 	for card in _cards:
 		var equipped := card.tool == snow_tools.equipped_scoop or card.tool == snow_tools.equipped_suction
-		card.update_action(_owned[card.tool.id], equipped, balance)
+		card.update_action(_owned[card.tool.id], equipped, balance, _purchase_requirement(card.tool))
+
+
+func _purchase_requirement(tool: SnowToolData) -> String:
+	if tool.requires != &"" and not _owned.get(tool.requires, false):
+		for card in _cards:
+			if card.tool.id == tool.requires:
+				return "Requires %s" % card.tool.display_name
+	if job_board.completed_jobs() < tool.completed_jobs_required:
+		return "After %d jobs" % tool.completed_jobs_required
+	return ""
 
 
 func owned_items() -> Array[String]:
@@ -100,6 +115,13 @@ func owned_items() -> Array[String]:
 		if _owned[id]:
 			items.append(String(id))
 	return items
+
+
+func owns_vacuum() -> bool:
+	for card in _cards:
+		if card.tool.kind == SnowToolData.Kind.SUCTION and _owned[card.tool.id]:
+			return true
+	return false
 
 
 func restore_items(items: Array, tools: Dictionary) -> void:

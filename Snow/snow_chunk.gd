@@ -3,6 +3,7 @@ extends MeshInstance3D
 
 @export_range(0.0, 1.5, 0.01) var initial_depth := 0.32
 @export_range(0.0, 1.5, 0.01) var pile_height := 0.0
+var lawn_depth_bonus := 0.0
 
 const MATERIAL = preload("res://Snow/snow_material.tres")
 
@@ -57,8 +58,9 @@ func initialize(field: SnowField, noise: FastNoiseLite) -> void:
 			# Shared edge samples contribute only their share of the represented volume.
 			weights[index] = field.spacing * field.spacing / float(expected)
 			depths[index] = maxf(0.0, base_depth * (1.0 + 0.45 * noise.get_noise_2dv(point)))
-			if not field.allows_snow_at(point):
-				editable[index] = 0
+			if lawn_depth_bonus > 0.0:
+				var edge := (Vector2(x, z) / float(side - 1) - Vector2(0.5, 0.5)).abs()
+				base_depth += lawn_depth_bonus * (1.0 - smoothstep(0.22, 0.50, maxf(edge.x, edge.y)))
 			if not editable[index]:
 				depths[index] = 0.0
 			elif pile_height > 0.0:

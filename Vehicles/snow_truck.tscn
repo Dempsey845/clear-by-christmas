@@ -6,6 +6,9 @@
 [ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_scoop.tscn" id="Scoop"]
 [ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_vacuum_nozzle.tscn" id="Nozzle"]
 [ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_vacuum_tank.tscn" id="Tank"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_blower.tscn" id="Blower"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_heater.tscn" id="Heater"]
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_wide_bucket.tscn" id="WideBucket"]
 
 [sub_resource type="BoxShape3D" id="Chassis"]
 size = Vector3(1.92, 0.42, 4.15)
@@ -28,6 +31,9 @@ wheel_visual = ExtResource("Wheel")
 scoop_visual = ExtResource("Scoop")
 vacuum_nozzle_visual = ExtResource("Nozzle")
 vacuum_tank_visual = ExtResource("Tank")
+blower_visual = ExtResource("Blower")
+wide_bucket_visual = ExtResource("WideBucket")
+heated_wheel_visual = ExtResource("Heater")
 
 [node name="Chassis" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.19, 0)
@@ -52,6 +58,9 @@ position = Vector3(0, -0.31, -2.87)
 
 [node name="RearOutlet" type="Marker3D" parent="."]
 position = Vector3(0, -0.18, 2.91)
+
+[node name="BlowerOutlet" type="Marker3D" parent="."]
+position = Vector3(3.1, -0.13, -2.85)
 
 [node name="ChaseCamera" type="Camera3D" parent="."]
 fov = 70.0

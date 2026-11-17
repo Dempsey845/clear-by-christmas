@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SnowToolData" format=3]
+
+[ext_resource type="Script" path="res://Tools/snow_tool_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"cyclone_vacuum"
+display_name = "Cyclone Vacuum"
+kind = 1
+price = 95
+requires = &"pro_suction"
+completed_jobs_required = 28
+area = Vector2(1.5, 1.65)
+depth = 1.45
+capacity_litres = 850.0
+dump_radius = 1.28
+color = Color(0.48, 0.30, 0.66, 1)

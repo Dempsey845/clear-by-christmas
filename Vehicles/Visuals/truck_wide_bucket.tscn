@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://Vehicles/Visuals/truck_scoop.tscn" id="Scoop"]
+
+[node name="TruckWideBucket" instance=ExtResource("Scoop")]
+scale = Vector3(1.24, 1.12, 1.10)

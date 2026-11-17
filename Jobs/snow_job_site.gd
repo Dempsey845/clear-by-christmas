@@ -3,6 +3,7 @@ extends Node3D
 
 @export var site_id: StringName
 @export var lawn_chunks: Array[SnowChunk]
+@export_range(0.0, 0.20, 0.005) var lawn_depth_bonus := 0.0
 
 var request: SnowJob
 

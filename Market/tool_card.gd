@@ -20,11 +20,13 @@ func display(data: SnowToolData) -> void:
 	]
 
 
-func update_action(owned: bool, equipped: bool, balance: int) -> void:
-	%Action.disabled = equipped or (not owned and balance < tool.price)
+func update_action(owned: bool, equipped: bool, balance: int, requirement: String) -> void:
+	%Action.disabled = equipped or (not owned and (balance < tool.price or not requirement.is_empty()))
 	if equipped:
 		%Action.text = "Equipped"
 	elif owned:
 		%Action.text = "Equip"
+	elif not requirement.is_empty():
+		%Action.text = requirement
 	else:
 		%Action.text = "Buy  £%d" % tool.price

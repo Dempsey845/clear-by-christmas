@@ -22,7 +22,6 @@ var _collision_dirty: Dictionary[Vector2i, bool] = {}
 var _modified: Dictionary[Vector2i, bool] = {}
 var _snowfall_multiplier := 1.0
 var _bounds: AABB
-var excluded_ground: Array[Rect2] = []
 
 
 func _ready() -> void:
@@ -186,6 +185,10 @@ func deposit(point: Vector3, radius: float, volume: float) -> bool:
 	return true
 
 
+func can_deposit(point: Vector3, radius: float) -> bool:
+	return contains_ground(point) and not _brush(point, Vector3.FORWARD, Vector2.ONE * radius * 2.0, true).is_empty()
+
+
 func stamp_footprint(point: Vector3, forward: Vector3, size: Vector2, depth: float) -> void:
 	# Keep a bootprint wide enough to reach vertices on coarser grids.
 	size = size.max(Vector2.ONE * spacing * 1.9)
@@ -308,22 +311,7 @@ func _sample_tile(sample: Vector2i) -> Vector2i:
 func contains_ground(point: Vector3) -> bool:
 	var local := to_local(point)
 	var tile := Vector2i((Vector2(local.x, local.z) / chunk_size).floor())
-	return _chunks.has(tile) and allows_snow_at(Vector2(local.x, local.z))
-
-
-func allows_snow_at(point: Vector2) -> bool:
-	for area in excluded_ground:
-		if area.has_point(point):
-			return false
-	return true
-
-
-func ground_rects() -> Array[Rect2]:
-	var areas: Array[Rect2] = []
-	for chunk in _chunks.values():
-		var corner := to_global(chunk.position)
-		areas.append(Rect2(Vector2(corner.x, corner.z), Vector2.ONE * chunk_size))
-	return areas
+	return _chunks.has(tile)
 
 
 func overlaps_ray_footprint(local_from: Vector3, local_to: Vector3) -> bool:

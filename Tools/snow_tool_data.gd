@@ -7,6 +7,8 @@ enum Kind { SCOOP, SUCTION }
 @export var display_name: String
 @export var kind: Kind
 @export_range(0, 10000) var price: int
+@export var requires: StringName
+@export_range(0, 100, 1, "or_greater") var completed_jobs_required := 0
 @export var area := Vector2(0.55, 0.64)
 ## Metres per scoop, or metres per second for suction.
 @export_range(0.01, 4.0, 0.01) var depth := 0.18

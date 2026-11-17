@@ -1,7 +1,5 @@
 extends Node3D
 
-const SAVE_PATH := "user://clear_by_christmas.save"
-const SAVE_VERSION := 1
 const INTERACTION_DISTANCE := 1.65
 
 @onready var player: CharacterBody3D = $Player
@@ -19,12 +17,14 @@ const INTERACTION_DISTANCE := 1.65
 @onready var truck: SnowTruck = $SnowTruck
 @onready var garage: TruckGarage = $TruckGarage
 @onready var call_point: Marker3D = $TelephoneBox/CallPoint
+@onready var save_menu: SaveMenu = $SaveMenu
 
 var _indoors := false
 var _exit_requested := false
 var _truck_cursor_released := false
 var _recall_requested := false
 var _recall_notice := 0.0
+var _new_game_state: Dictionary
 
 
 func _ready() -> void:
@@ -32,10 +32,13 @@ func _ready() -> void:
 	garage.configure(truck, board)
 	clock.configure($WorldEnvironment.environment, sun, board.hud)
 	board.hud.phone_toggled.connect(_set_phone_open)
-	board.hud.save_requested.connect(_save_game)
-	board.hud.load_requested.connect(_load_game)
-	if FileAccess.file_exists(SAVE_PATH):
-		_load_game()
+	board.hud.save_menu_requested.connect(save_menu.open)
+	save_menu.save_requested.connect(_save_game)
+	save_menu.load_requested.connect(_load_game)
+	save_menu.restart_requested.connect(_restart_game)
+	_new_game_state = _capture_game()
+	if SaveSlots.has_any():
+		save_menu.open(true)
 
 
 func _process(delta: float) -> void:
@@ -86,7 +89,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if _near_truck():
-		if truck.owned or board.try_spend(SnowTruck.PRICE):
+		if truck.owned or (_truck_purchase_requirement().is_empty() and board.try_spend(SnowTruck.PRICE)):
 			truck.owned = true
 			_set_driving(true)
 		get_viewport().set_input_as_handled()
@@ -168,6 +171,14 @@ func _near_truck() -> bool:
 	return absf(local.y) < 1.4 and side.distance_to(Vector2(0.95, -0.45)) < 2.0
 
 
+func _truck_purchase_requirement() -> String:
+	if board.completed_jobs() < SnowTruck.PURCHASE_JOBS:
+		return "Available after %d jobs" % SnowTruck.PURCHASE_JOBS
+	if not market.owns_vacuum():
+		return "Requires a handheld vacuum"
+	return ""
+
+
 func _interaction_prompt() -> String:
 	if truck.driving:
 		var controls := "WASD  Drive  ·  Space  Brake"
@@ -175,12 +186,16 @@ func _interaction_prompt() -> String:
 			controls += "  ·  E  Garage" if garage.contains_truck() else "  ·  E  Exit"
 		if truck.attachment == SnowTruck.Attachment.NONE:
 			controls += "\nPark inside the garage to fit equipment"
+		elif truck.attachment == SnowTruck.Attachment.BLOWER:
+			controls += "\nLMB  Blow snow to the right"
 		else:
-			var action := "Scoop" if truck.attachment == SnowTruck.Attachment.SCOOP else "Vacuum"
-			var capacity := float(SnowTruck.CAPACITIES[truck.attachment])
+			var action := "Vacuum" if truck.attachment == SnowTruck.Attachment.VACUUM else "Scoop"
+			var capacity := truck.cargo_capacity()
 			controls += "\nLMB  %s  ·  RMB  Dump  ·  %.0f / %.0f L" % [
 				action, truck.cargo * 1000.0, capacity * 1000.0,
 			]
+		if truck.has_upgrade(SnowTruck.Upgrade.HEATED_WHEELS):
+			controls += "\nH  Wheel heat %s" % ("on" if truck.heating else "off")
 		if not truck.feedback.is_empty():
 			controls += "\n" + truck.feedback
 		return controls
@@ -191,6 +206,9 @@ func _interaction_prompt() -> String:
 	if _near_truck():
 		if truck.owned:
 			return "E   Enter truck"
+		var requirement := _truck_purchase_requirement()
+		if not requirement.is_empty():
+			return "Truck for sale  ·  £%d  ·  %s" % [SnowTruck.PRICE, requirement]
 		if board.balance >= SnowTruck.PRICE:
 			return "E   Buy and enter truck  ·  £%d" % SnowTruck.PRICE
 		return "Truck for sale  ·  £%d  ·  Balance £%d" % [SnowTruck.PRICE, board.balance]
@@ -219,12 +237,12 @@ func _set_indoors(indoors: bool) -> void:
 	tools.set_available(not indoors and not truck.driving)
 
 
-func _save_game() -> void:
+func _capture_game() -> Dictionary:
 	var snow := {}
 	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
 		snow[String(get_path_to(field))] = field.save_state()
-	var state := {
-		"version": SAVE_VERSION,
+	return {
+		"version": SaveSlots.VERSION,
 		"jobs": board.save_state(),
 		"snow": snow,
 		"owned": market.owned_items(),
@@ -236,33 +254,36 @@ func _save_game() -> void:
 		"truck": truck.save_state(),
 		"hour": clock.hour,
 	}
-	var temporary_path := SAVE_PATH + ".tmp"
-	var file := FileAccess.open(temporary_path, FileAccess.WRITE)
-	if file == null:
-		board.hud.set_save_status("Couldn’t open the save file.")
-		return
-	var written := file.store_var(state)
-	file.close()
-	if not written or DirAccess.rename_absolute(temporary_path, SAVE_PATH) != OK:
-		board.hud.set_save_status("Couldn’t write the save file.")
-		return
-	board.hud.set_save_status("Game saved.")
 
 
-func _load_game() -> void:
-	var file := FileAccess.open(SAVE_PATH, FileAccess.READ)
-	if file == null:
-		board.hud.set_save_status("No saved game found.")
+func _save_game(slot: int) -> void:
+	var result := SaveSlots.write(slot, _capture_game())
+	save_menu.refresh("Saved to slot %d." % slot if result == OK else "Couldn’t save to slot %d." % slot)
+
+
+func _load_game(slot: int) -> void:
+	var state := SaveSlots.read(slot)
+	if state.is_empty():
+		save_menu.refresh("Couldn’t load slot %d." % slot)
 		return
-	var state: Variant = file.get_var()
-	if not _is_save(state):
-		board.hud.set_save_status("This save couldn’t be loaded.")
-		return
+	_restore_game(state)
+
+
+func _restart_game() -> void:
+	_restore_game(_new_game_state)
+
+
+func _restore_game(state: Dictionary) -> void:
+	save_menu.close()
+	board.hud.close_phone()
 	var jobs: Dictionary = state.jobs
 	var day := clampi(jobs.get("day", 1), 1, JobBoard.LAST_DAY)
 	var multiplier := JobBoard.snow_multiplier_for_day(day)
 	for field: SnowField in get_tree().get_nodes_in_group("snow_fields"):
-		field.restore_state(state.snow.get(String(get_path_to(field)), {}), multiplier)
+		var saved_field: Dictionary = state.snow.get(String(get_path_to(field)), {})
+		if state.version == 1 and field == $TownSnow:
+			saved_field = $TownSnow.upgrade_legacy_state(saved_field)
+		field.restore_state(saved_field, multiplier)
 	market.restore_items(state.owned, state.tools)
 	_set_driving(false)
 	_exit_requested = false
@@ -278,13 +299,3 @@ func _load_game() -> void:
 		_set_driving(true)
 	var hour: Variant = state.get("hour", TownClock.MORNING)
 	clock.set_hour(hour if hour is float and is_finite(hour) else TownClock.MORNING)
-	board.hud.set_save_status("Save loaded.")
-
-
-func _is_save(state: Variant) -> bool:
-	return (state is Dictionary and state.get("version") == SAVE_VERSION
-		and state.get("jobs") is Dictionary and state.get("snow") is Dictionary
-		and state.get("owned") is Array and state.get("tools") is Dictionary
-		and state.get("position") is Vector3 and state.position.is_finite()
-		and state.get("yaw") is float and state.get("pitch") is float
-		and state.get("indoors") is bool)

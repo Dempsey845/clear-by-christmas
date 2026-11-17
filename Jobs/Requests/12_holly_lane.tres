@@ -7,4 +7,5 @@ script = ExtResource("1")
 site_id = &"holly_12"
 client_name = "Maya Bennett"
 address = "12 Holly Lane"
-pay = 25
+pay = 16
+required_clear_percent = 88

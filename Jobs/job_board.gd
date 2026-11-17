@@ -71,6 +71,10 @@ func try_spend(amount: int) -> bool:
 	return true
 
 
+func completed_jobs() -> int:
+	return _history.size()
+
+
 func accept_job() -> void:
 	if _job != null or day_finished:
 		return
@@ -116,7 +120,7 @@ func save_state() -> Dictionary:
 		daily_sites.append(String(request.site_id))
 	return {
 		"balance": balance, "day": day, "request_index": _request_index,
-		"accepted": _job != null, "history": _history, "daily_sites": daily_sites,
+		"accepted": _job != null, "history": _history.duplicate(true), "daily_sites": daily_sites,
 	}
 
 
